@@ -115,8 +115,12 @@ export function runHarvester(creep: Creep): void {
           mem.state = State.moving;
           break;
         }
-        // spawn is full, deposit remainder in room controller
+        // spawn is full
         case ERR_FULL: {
+          // wait for spawn to finish spawning. otherwise, fill room controller
+          if ((target as StructureSpawn).spawning)
+            break;
+
           const controller = creep.room.controller as Structure;
           mem.target = controller;
           mem.state = State.moving;
