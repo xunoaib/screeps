@@ -158,4 +158,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   handleAllSpawns();
   runAllCreepLogic();
   cleanup();
+
+  if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST)
+    Game.cpu.generatePixel();
 });
