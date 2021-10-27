@@ -17,7 +17,7 @@ declare global {
     home: StructureSpawn;
     room: string
     state: State;
-    target: Source | StructureSpawn;
+    target: Source | Structure;
   }
 
   namespace NodeJS {
@@ -91,8 +91,9 @@ export function runHarvester(creep: Creep): void {
     case State.moving: {
       creep.moveTo(target, { visualizePathStyle: { stroke: '#ccc' } });
       const rangeTo = creep.pos.getRangeTo(target);
-      // creep must be 1 tile away to deposit at spawn or harvest
-      if (rangeTo <= 1)
+      const minRange = target instanceof StructureController ? 3 : 1;
+
+      if (rangeTo <= minRange)
         mem.state = creep.store.energy == 0 ? State.harvesting : State.depositing;
       break;
     }
@@ -106,9 +107,28 @@ export function runHarvester(creep: Creep): void {
       break;
     }
     case State.depositing: {
-      if (creep.transfer(target as StructureSpawn, RESOURCE_ENERGY) == ERR_NOT_ENOUGH_RESOURCES) {
-        mem.target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE) ?? mem.home;
-        mem.state = State.moving;
+      const status = creep.transfer(target as Structure, RESOURCE_ENERGY);
+      switch (status) {
+        // unloaded everything, return to source
+        case ERR_NOT_ENOUGH_RESOURCES: {
+          mem.target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE) ?? mem.home;
+          mem.state = State.moving;
+          break;
+        }
+        // spawn is full, deposit remainder in room controller
+        case ERR_FULL: {
+          const controller = creep.room.controller as Structure;
+          mem.target = controller;
+          mem.state = State.moving;
+          break;
+        }
+      }
+      
+      // upgrade controller with excess energy
+      if (target instanceof StructureController) {
+        const status = creep.upgradeController(target) as ScreepsReturnCode;
+        if (_.indexOf([OK, ERR_NOT_ENOUGH_RESOURCES, ERR_NOT_ENOUGH_ENERGY], status) == -1)
+          console.log("error upgrading controller: " + status)
       }
       break;
     }
