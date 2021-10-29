@@ -24,6 +24,10 @@ declare global {
     target: Source | Structure;
   }
 
+  interface Creep {
+    memory: CreepMemory;
+  }
+
   namespace NodeJS {
     interface Global {
       log: any;
@@ -72,19 +76,19 @@ export function runCreepLogic(creep: Creep): void {
     return;
 
   switch (creep.memory.role) {
-    case "harvester": {
+    case Role.harvester: {
       runHarvester(creep);
       break;
     }
     default: {
       console.log(creep.name + " has an unknown role. Recruiting as harvester");
-      (creep.memory as CreepMemory).role = Role.harvester;
+      creep.memory.role = Role.harvester;
     }
   }
 }
 
 export function runHarvester(creep: Creep): void {
-  const mem = creep.memory as CreepMemory;
+  const mem = creep.memory;
   const target = Game.getObjectById(mem.target.id);
   if (target == null) {
     console.log(creep.name + " has a null target");
