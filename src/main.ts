@@ -1,9 +1,13 @@
 import { ErrorMapper } from "utils/ErrorMapper";
 
 enum State {
-  moving,
-  harvesting,
-  depositing,
+  moving = "moving",
+  harvesting = "harvesting",
+  depositing = "depositing",
+}
+
+enum Role {
+  harvester = "harvester",
 }
 
 declare global {
@@ -13,9 +17,9 @@ declare global {
   }
 
   interface CreepMemory {
-    role: string;
+    role: Role;
     home: StructureSpawn;
-    room: string
+    room: string;
     state: State;
     target: Source | Structure;
   }
@@ -49,7 +53,7 @@ export function spawnHarvester(spawn: StructureSpawn): void {
   const creepParts = [WORK, WORK, CARRY, MOVE];
   const creepName = 'Harvester_' + Game.time.toString();
   const creepMem: CreepMemory = {
-    role: 'harvester',
+    role: Role.harvester,
     home: spawn,
     room: spawn.room.name,
     state: State.moving,
@@ -74,7 +78,7 @@ export function runCreepLogic(creep: Creep): void {
     }
     default: {
       console.log(creep.name + " has an unknown role. Recruiting as harvester");
-      (creep.memory as CreepMemory).role = "harvester";
+      (creep.memory as CreepMemory).role = Role.harvester;
     }
   }
 }
