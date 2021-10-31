@@ -1,6 +1,6 @@
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role, State } from "creepConstants";
-import { RoleHarvester } from "harvester";
+import roleHarvester from "harvester";
 import { handleAllSpawns } from "spawner";
 
 declare global {
@@ -39,11 +39,10 @@ export function runCreepLogic(creep: Creep): void {
 
   switch (creep.memory.role) {
     case Role.harvester: {
-      return RoleHarvester.run(creep);
+      return roleHarvester.run(creep);
     }
     default: {
-      console.log(creep.name + " has an unknown role. Recruiting as harvester");
-      creep.memory.role = Role.harvester;
+      console.log(creep.name + " has an unknown role");
     }
   }
 }
