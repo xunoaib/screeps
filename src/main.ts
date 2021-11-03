@@ -1,5 +1,5 @@
 import { ErrorMapper } from "utils/ErrorMapper";
-import { Role, State } from "creepConstants";
+import { Role } from "creepConstants";
 import roleHarvester, { Harvester } from "harvester";
 import { handleAllSpawns } from "spawner";
 import { RoomManager } from "roomManager";
