@@ -1,7 +1,8 @@
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role, State } from "creepConstants";
-import roleHarvester from "harvester";
+import roleHarvester, { Harvester } from "harvester";
 import { handleAllSpawns } from "spawner";
+import { RoomManager } from "roomManager";
 
 declare global {
   interface Memory {
@@ -22,16 +23,17 @@ declare global {
   }
 
   interface CreepMemory {
-    role: string;
-    home: StructureSpawn;
-    room: string;
-    state: State;
-    target?: Source | Structure;
+    role: Role;
   }
 }
 
 export function runAllCreepLogic(): void {
-  _.map(Game.creeps, runCreepLogic);
+  _.map(Game.rooms, runRoomCreepLogic);
+}
+
+export function runRoomCreepLogic(room: Room): void {
+  const manager = new RoomManager(room);
+  _.map(manager.creeps, runCreepLogic);
 }
 
 export function runCreepLogic(creep: Creep): void {
@@ -40,7 +42,7 @@ export function runCreepLogic(creep: Creep): void {
 
   switch (creep.memory.role) {
     case Role.harvester: {
-      return roleHarvester.run(creep);
+      return roleHarvester.run(creep as Harvester);
     }
     default: {
       console.log(creep.name + " has an unknown role");

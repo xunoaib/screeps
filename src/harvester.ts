@@ -1,53 +1,73 @@
-import { State } from "creepConstants";
-import { goHarvest, goTransfer, findEnergyTarget } from "CreepActions";
+import { EnergyStructure } from "filters";
+import { goHarvest, goTransfer, findEnergyTarget, RANGES } from "CreepActions";
+import { Role } from "creepConstants";
+
+export interface HarvesterMemory extends CreepMemory {
+  role: Role.harvester,
+  target: string;
+  harvesting: boolean;
+}
+
+export interface Harvester extends Creep {
+  memory: HarvesterMemory;
+}
 
 const roleHarvester = {
-  run(creep: Creep): void {
-    if (creep.memory.target == undefined) {
-      console.log(creep.name + ": no target");
+  run(creep: Harvester): void {
+    const target = Game.getObjectById(creep.memory.target as Id<Source|EnergyStructure>);
+    if (!target) {
+      console.log(creep.name + " has unknown target");
       return;
     }
 
-    const target = Game.getObjectById(creep.memory.target.id);
-
-    switch (creep.memory.state) {
-      case State.harvesting: {
-        goHarvest(creep, target as Source);
-
-        // creep is full, time to depo
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-          creep.memory.target = findEnergyTarget(creep) ?? creep.memory.home;
-          creep.memory.state = State.depositing;
+    if (creep.memory.harvesting) {
+      // creep is full, time to deposit
+      if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+        const target = findEnergyTarget(creep.room) as EnergyStructure; // TODO: sort by distance
+        if (target) {
+          creep.memory.target = target.id;
+          creep.memory.harvesting = false;
+        } else {
+          console.log("No active sources found");
         }
-        break;
+        return;
       }
 
-      case State.depositing: {
-        const result = goTransfer(creep, target as Structure, RESOURCE_ENERGY);
-        if (result == ERR_FULL) {
-          // wait on spawn if spawning, otherwise deposit in room controller
-          if (!(target as StructureSpawn).spawning) {
-            creep.memory.target = creep.room.controller;
-          }
-          break;
-        }
-
-        // creep is empty, time to refill
-        if (creep.store.energy == 0) {
-          const newTarget = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-          if (newTarget) {
-            creep.memory.target = newTarget;
-            creep.memory.state = State.harvesting;
-          }
-        }
-        break;
+      const result = goHarvest(creep, target as Source);
+      if (result != OK) {
+        console.log("Error harvesting: " + result);
+        return;
       }
 
-      default: {
-        console.log(creep.name + " state error")
+    } else { // depositing
+      // finished depositing, now begin harvesting
+      if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+        const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+        if (source) {
+          creep.memory.target = source.id;
+          creep.memory.harvesting = true;
+        } else {
+          console.log("No active sources found");
+        }
+        return;
+      }
+
+      const range = target instanceof StructureController ? RANGES.UPGRADE : RANGES.TRANSFER;
+      const result = goTransfer(creep, target as EnergyStructure, RESOURCE_ENERGY, undefined, range);
+
+      if (result == ERR_FULL) {
+        if (!(target as StructureSpawn).spawning) { // wait for spawn to consume energy if spawning
+          if (creep.room.controller != undefined) { // fall back to room controller
+            creep.memory.target = creep.room.controller.id;
+          } else {
+            console.log("No room controller found");
+          }
+        } // else: wait for spawn to spawn
+      } else if (result != OK) {
+        console.log("Error transferring: " + result);
       }
     }
-  } 
+  }
 }
 
 export default roleHarvester;
