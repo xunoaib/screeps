@@ -12,6 +12,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       log: any;
+      age?: number;
     }
   }
 
@@ -56,9 +57,19 @@ export function cleanup() {
   }
 }
 
-export const loop = ErrorMapper.wrapLoop(() => {
-  console.log(`Current game tick is ${Game.time}`);
+export function setupGlobalCache() {
+  if (global.age == undefined) {
+    console.log(`<font color="red">Global reset occurred</font>`);
+    global.age = 0;
+  } else {
+    global.age++;
+  }
+}
 
+export const loop = ErrorMapper.wrapLoop(() => {
+  console.log(`<font color="green"><strong>Current game tick is ${Game.time}</strong></font>`);
+
+  setupGlobalCache();
   handleAllSpawns();
   runAllCreepLogic();
   cleanup();
