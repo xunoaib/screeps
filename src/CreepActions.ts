@@ -2,6 +2,7 @@ export const RANGES = {
   HARVEST: 1,
   TRANSFER: 1,
   UPGRADE: 3,
+  BUILD: 3,
 }
 
 export function goHarvest(creep: Creep, source: Source) {
@@ -23,8 +24,15 @@ export function goTransfer(creep: Creep, target: Creep | PowerCreep | Structure,
 export function goTo(creep: Creep, pos: RoomPosition | { pos: RoomPosition }) {
   if (creep.fatigue == 0)
     return creep.moveTo(pos, { visualizePathStyle: { stroke: '#ccc' } });
-  // else return ERR_TIRED;
   return OK;
+}
+
+export function goBuild(creep: Creep, target: ConstructionSite) {
+  if (creep.pos.inRangeTo(target.pos, RANGES.BUILD)) {
+    return creep.build(target);
+  } else {
+    return goTo(creep, target);
+  }
 }
 
 // find energy storage target and enter depositing state
@@ -48,4 +56,9 @@ export function findEnergyTarget(room: Room): Structure | null {
 
   // then room controller
   return room.controller ?? null;
+}
+
+export function findClosestConstructionSites(room: Room, pos: RoomPosition): ConstructionSite[] {
+  const sites = room.find(FIND_CONSTRUCTION_SITES);
+  return _.sortBy(sites, (site) => site.pos.getRangeTo(pos));
 }

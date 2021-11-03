@@ -4,7 +4,7 @@ import { Role } from "creepConstants";
 
 export interface HarvesterMemory extends CreepMemory {
   role: Role.harvester,
-  target: string;
+  target: Id<Source|EnergyStructure>;
   harvesting: boolean;
 }
 

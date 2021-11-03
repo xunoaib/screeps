@@ -1,3 +1,4 @@
 export enum Role {
-  harvester = "harvester"
+  harvester = "harvester",
+  builder = "builder",
 }
