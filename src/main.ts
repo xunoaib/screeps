@@ -4,6 +4,7 @@ import roleHarvester, { Harvester } from "harvester";
 import { handleAllSpawns } from "spawner";
 import { RoomManager } from "roomManager";
 import roleBuilder, { Builder } from "builder";
+import roleMiner, { Miner } from "miner";
 
 declare global {
   interface Memory {
@@ -47,6 +48,9 @@ export function runCreepLogic(creep: Creep): void {
     }
     case Role.builder: {
       return roleBuilder.run(creep as Builder);
+    }
+    case Role.miner: {
+      return roleMiner.run(creep as Miner);
     }
     default: {
       console.log(creep.name + " has an unknown role");

@@ -1,6 +1,7 @@
 import { HarvesterMemory } from "harvester";
 import { BuilderMemory } from "builder";
 import { Role } from "creepConstants";
+import { Miner, MinerMemory } from "miner";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -17,20 +18,46 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const creepCount    = _.size(Game.creeps);
   const numHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == Role.harvester).length;
   const numBuilders   = _.filter(Game.creeps, (creep) => creep.memory.role == Role.builder).length;
+  const miners        = _.filter(Game.creeps, (creep) => creep.memory.role == Role.miner) as Miner[];
+  const sources        = spawn.room.find(FIND_SOURCES_ACTIVE);
+
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
 
-  if (numHarvesters < 3) {
+  // ensure a minimum number of harvesters
+  if (numHarvesters < 1) {
     return spawnHarvester(spawn);
   }
 
-  // spawn one builder for every three sites, but allow no more than three builders
-  if (sites.length && numBuilders < 3 && numBuilders * 3 < sites.length) {
+  // spawn enough miners for each source
+  if (miners.length < sources.length) {
+    const minedSources  = _.map(miners, miner => Game.getObjectById(miner.memory.target));
+    const freeSources = _.difference(sources, minedSources);
+
+    // look for unmined sources
+    if (freeSources.length && freeSources[0])
+      return spawnMiner(spawn, freeSources[0]);
+  }
+
+  // spawn one builder for every three sites, but enforce a maximum
+  if (sites.length && numBuilders < 4 && numBuilders * 3 < sites.length) {
     return spawnBuilder(spawn);
   }
 
-  if (numHarvesters < 6) {
+  // spawn extra harvesters otherwise
+  if (numHarvesters < 10) {
     return spawnHarvester(spawn);
   }
+}
+
+export function spawnMiner(spawn: StructureSpawn, source: Source): void {
+  const creepParts = [WORK, WORK, CARRY, MOVE];
+  const creepName = 'Miner_' + Game.time.toString();
+  const creepMem: MinerMemory = {
+    role: Role.miner,
+    target: source.id,
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
 }
 
 export function spawnHarvester(spawn: StructureSpawn): void {
