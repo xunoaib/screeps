@@ -2,6 +2,7 @@ import { HarvesterMemory } from "harvester";
 import { BuilderMemory } from "builder";
 import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
+import { Scavenger } from "scavenger";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -19,6 +20,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const numHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == Role.harvester).length;
   const numBuilders   = _.filter(Game.creeps, (creep) => creep.memory.role == Role.builder).length;
   const miners        = _.filter(Game.creeps, (creep) => creep.memory.role == Role.miner) as Miner[];
+  const scavengers    = _.filter(Game.creeps, (creep) => creep.memory.role == Role.scavenger) as Scavenger[];
   const sources        = spawn.room.find(FIND_SOURCES_ACTIVE);
 
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
@@ -38,13 +40,18 @@ export function handleSpawn(spawn: StructureSpawn): void {
       return spawnMiner(spawn, freeSources[0]);
   }
 
+  // spawn harvesters to accommodate miners and dropped energy
+  if (scavengers.length == 0 || scavengers.length < miners.length * 2) {
+    return spawnScavenger(spawn);
+  }
+
   // spawn one builder for every three sites, but enforce a maximum
   if (sites.length && numBuilders < 4 && numBuilders * 3 < sites.length) {
     return spawnBuilder(spawn);
   }
 
   // spawn extra harvesters otherwise
-  if (numHarvesters < 10) {
+  if (numHarvesters < 2) {
     return spawnHarvester(spawn);
   }
 }
@@ -55,6 +62,17 @@ export function spawnMiner(spawn: StructureSpawn, source: Source): void {
   const creepMem: MinerMemory = {
     role: Role.miner,
     target: source.id,
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnScavenger(spawn: StructureSpawn): void {
+  const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE];
+  const creepName = 'Scavenger_' + Game.time.toString();
+  const creepMem = {
+    role: Role.scavenger,
+    delivering: false,
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

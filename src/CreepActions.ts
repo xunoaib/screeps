@@ -1,5 +1,6 @@
 export const RANGES = {
   HARVEST: 1,
+  PICKUP: 1,
   TRANSFER: 1,
   UPGRADE: 3,
   BUILD: 3,
@@ -11,6 +12,14 @@ export function goHarvest(creep: Creep, source: Source) {
     return creep.harvest(source);
   } else {
     return goTo(creep, source);
+  }
+}
+
+export function goPickup(creep: Creep, resource: Resource) {
+  if (creep.pos.inRangeTo(resource.pos, RANGES.PICKUP)) {
+    return creep.pickup(resource);
+  } else {
+    return goTo(creep, resource);
   }
 }
 
