@@ -29,7 +29,9 @@ const roleBuilder = {
 
       const result = goHarvest(creep, target as Source);
       if (result != OK) {
-        console.log(creep.name + " error harvesting: " + result);
+        if (result != ERR_NO_PATH) {
+          console.log("Error harvesting: " + result);
+        }
         return;
       }
 

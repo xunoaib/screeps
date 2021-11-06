@@ -3,6 +3,7 @@ export const RANGES = {
   TRANSFER: 1,
   UPGRADE: 3,
   BUILD: 3,
+  REPAIR: 3,
 }
 
 export function goHarvest(creep: Creep, source: Source) {
@@ -35,6 +36,14 @@ export function goBuild(creep: Creep, target: ConstructionSite) {
   }
 }
 
+export function goRepair(creep: Creep, target: Structure) {
+  if (creep.pos.inRangeTo(target.pos, RANGES.REPAIR)) {
+    return creep.repair(target);
+  } else {
+    return goTo(creep, target);
+  }
+}
+
 // find energy storage target and enter depositing state
 export function findEnergyTarget(room: Room): Structure | null {
   // try to fill spawns
@@ -53,6 +62,13 @@ export function findEnergyTarget(room: Room): Structure | null {
 
   if (rankedExtensions.length)
     return rankedExtensions[0];
+
+  // repairable objects (below 75%)
+  const repairable = room.find(FIND_STRUCTURES, {
+    filter: (s: Structure) => (s.hits / s.hitsMax < 0.75)
+  });
+  if (repairable.length)
+    return repairable[0];
 
   // then room controller
   return room.controller ?? null;

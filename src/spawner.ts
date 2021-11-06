@@ -23,8 +23,13 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return spawnHarvester(spawn);
   }
 
-  if (sites.length && numBuilders < 1) {
+  // spawn one builder for every three sites, but allow no more than three builders
+  if (sites.length && numBuilders < 3 && numBuilders * 3 < sites.length) {
     return spawnBuilder(spawn);
+  }
+
+  if (numHarvesters < 6) {
+    return spawnHarvester(spawn);
   }
 }
 
