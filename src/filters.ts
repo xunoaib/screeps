@@ -1,1 +1,1 @@
-export type EnergyStructure = StructureSpawn | StructureContainer | StructureExtension | StructureController;
+export type EnergyStructure = StructureSpawn | StructureContainer | StructureExtension | StructureController | StructureTower;

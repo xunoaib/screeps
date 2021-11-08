@@ -62,6 +62,23 @@ export function runCreepLogic(creep: Creep): void {
   }
 }
 
+
+export function runAllDefenses() {
+  _.map(Game.rooms, runRoomDefenses);
+}
+
+export function runRoomDefenses(room: Room) {
+  const invaders = room.find(FIND_HOSTILE_CREEPS).sort((a, b) => b.hits - a.hits);
+  if (!invaders) return;
+
+  const towers = room.find(FIND_MY_STRUCTURES, {
+    filter: (tower) => tower.structureType == STRUCTURE_TOWER
+  }) as StructureTower[];
+
+  // TODO: only attack at close range
+  _.forEach(towers, (tower) => tower.attack(invaders[0]));
+}
+
 // automatically delete memory of missing creeps
 export function cleanup() {
   for (const name in Memory.creeps) {
@@ -84,6 +101,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   console.log(`<font color="green"><strong>Current game tick is ${Game.time}</strong></font>`);
 
   setupGlobalCache();
+  runAllDefenses();
   handleAllSpawns();
   runAllCreepLogic();
   cleanup();
