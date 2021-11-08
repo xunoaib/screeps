@@ -4,6 +4,7 @@ import { Role } from "creepConstants";
 export interface MinerMemory extends CreepMemory {
   role: Role.miner,
   target: Id<Source>;
+  container?: Id<StructureContainer>;
 }
 
 export interface Miner extends Creep {
@@ -12,6 +13,16 @@ export interface Miner extends Creep {
 
 const roleMiner = {
   run(creep: Miner): void {
+    // move to container if found (and not here)
+    if (creep.memory.container) {
+      const container = Game.getObjectById(creep.memory.container);
+      if (container && !creep.pos.inRangeTo(container, 0)) {
+        creep.moveTo(container.pos);
+      }
+    } else { // memory unset, so look for a container
+      this.findMiningLocation(creep);
+    }
+
     // find/target energy source
     const target = Game.getObjectById(creep.memory.target as Id<Source>);
     if (!target) {
@@ -45,9 +56,25 @@ const roleMiner = {
    },
 
   findMiningLocation(creep: Miner) {
-    const target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE)?.id;
-    if (target) {
-      creep.memory.target = target;
+    const target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    if (!target) return;
+
+    // set target source
+    creep.memory.target = target.id;
+
+    // look for nearby structures
+    const containers = target.room.lookForAtArea(LOOK_STRUCTURES,
+      target.pos.y-1,
+      target.pos.x-1,
+      target.pos.y+1,
+      target.pos.x+1,
+      true
+    );
+
+    // select the first container found, if any
+    const result = _.find(containers, (result) => (result.structure.structureType == STRUCTURE_CONTAINER));
+    if (result) {
+      creep.memory.container = result.structure.id as Id<StructureContainer>;
     }
   }
 }
