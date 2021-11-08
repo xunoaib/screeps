@@ -3,6 +3,7 @@ import { BuilderMemory } from "builder";
 import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
 import { Scavenger } from "scavenger";
+import { generateMinerBody } from "creepBody";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -51,13 +52,17 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn extra harvesters otherwise
-  if (numHarvesters < 2) {
+  if (numHarvesters < 3) {
     return spawnHarvester(spawn);
+  }
+
+  if (scavengers.length < 9) {
+    return spawnScavenger(spawn);
   }
 }
 
 export function spawnMiner(spawn: StructureSpawn, source: Source): void {
-  const creepParts = [WORK, WORK, CARRY, MOVE];
+  const creepParts = generateMinerBody(spawn.room.energyAvailable);
   const creepName = 'Miner_' + Game.time.toString();
   const creepMem: MinerMemory = {
     role: Role.miner,
