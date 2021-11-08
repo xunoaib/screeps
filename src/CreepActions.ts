@@ -1,7 +1,10 @@
+import { EnergyStructure } from "filters";
+
 export const RANGES = {
   HARVEST: 1,
   PICKUP: 1,
   TRANSFER: 1,
+  WITHDRAW: 1,
   UPGRADE: 3,
   BUILD: 3,
   REPAIR: 3,
@@ -26,6 +29,14 @@ export function goPickup(creep: Creep, resource: Resource) {
 export function goTransfer(creep: Creep, target: Creep | PowerCreep | Structure, resource: ResourceConstant, amount?: number, range?: number) {
   if (creep.pos.inRangeTo(target.pos, range ?? RANGES.TRANSFER)) {
     return creep.transfer(target, resource, amount);
+  } else {
+    return goTo(creep, target);
+  }
+}
+
+export function goWithdraw(creep: Creep, target: EnergyStructure, resource: ResourceConstant, amount?: number) {
+  if (creep.pos.inRangeTo(target.pos, RANGES.WITHDRAW)) {
+    return creep.withdraw(target, resource, amount);
   } else {
     return goTo(creep, target);
   }
