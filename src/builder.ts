@@ -42,7 +42,7 @@ const roleBuilder = {
         console.log(creep.name + " unknown target type");
       }
 
-    } else { // building
+    } else { // building (initial state)
       // out of energy, retrieve energy from container
       if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
         this.focusEnergySource(creep);

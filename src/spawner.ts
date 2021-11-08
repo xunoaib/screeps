@@ -103,18 +103,11 @@ export function spawnHarvester(spawn: StructureSpawn): void {
 }
 
 export function spawnBuilder(spawn: StructureSpawn): void {
-  const source = spawn.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-  if (!source) {
-    console.log("No sources found for new builder");
-    return;
-  }
-
   const creepParts = [WORK, WORK, CARRY, MOVE];
   const creepName = 'Builder_' + Game.time.toString();
-  const creepMem: BuilderMemory = {
+  const creepMem = {
     role: Role.builder,
-    harvesting: true,
-    target: source.id,
+    harvesting: false,
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
