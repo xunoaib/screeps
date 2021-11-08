@@ -86,7 +86,7 @@ export function findEnergyTarget(room: Room): Structure | null {
   // repairable objects (below 75%)
   const repairable = room.find(FIND_STRUCTURES, {
     filter: (s: Structure) => (s.hits / s.hitsMax < 0.75)
-  });
+  }).sort(s => s.hits / s.hitsMax);
   if (repairable.length)
     return repairable[0];
 
@@ -97,4 +97,18 @@ export function findEnergyTarget(room: Room): Structure | null {
 export function findClosestConstructionSites(room: Room, pos: RoomPosition): ConstructionSite[] {
   const sites = room.find(FIND_CONSTRUCTION_SITES);
   return _.sortBy(sites, (site) => site.pos.getRangeTo(pos));
+}
+
+export function findSourceContainer(target: RoomObject) {
+  if (!target.room) return;
+
+  const containers = target.room.lookForAtArea(LOOK_STRUCTURES,
+    target.pos.y-1,
+    target.pos.x-1,
+    target.pos.y+1,
+    target.pos.x+1,
+    true
+  );
+
+  return _.find(containers, (result) => (result.structure.structureType == STRUCTURE_CONTAINER));
 }

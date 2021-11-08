@@ -14,7 +14,7 @@ export interface Builder extends Creep {
 const roleBuilder = {
   run(creep: Builder): void {
     const target = Game.getObjectById(creep.memory.target as Id<StructureContainer|Source|ConstructionSite>);
-    if (!target) {
+    if (!target) { // construction site complete / container destroyed
       if (!this.focusConstructionSite(creep))
         console.log(creep.name + " has no more sites");
       return;
@@ -29,12 +29,12 @@ const roleBuilder = {
 
       // withdraw or harvest
       if (target instanceof StructureContainer) {
-        const result = goWithdraw(creep, target as StructureContainer, RESOURCE_ENERGY);
+        const result = goWithdraw(creep, target, RESOURCE_ENERGY);
         if (result != OK) {
           console.log(creep.name + " error withdrawing: " + result);
         }
       } else if (target instanceof Source) {
-        const result = goHarvest(creep, target as Source);
+        const result = goHarvest(creep, target);
         if (result != OK && result != ERR_NO_PATH) {
           console.log(creep.name + " error harvesting: " + result);
         }

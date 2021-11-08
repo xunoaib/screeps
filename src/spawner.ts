@@ -32,7 +32,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
 
   // spawn enough miners for each source
   if (miners.length < sources.length) {
-    const minedSources  = _.map(miners, miner => Game.getObjectById(miner.memory.target));
+    const minedSources  = _.map(miners, miner => Game.getObjectById(miner.memory.source));
     const freeSources = _.difference(sources, minedSources);
 
     // look for unmined sources
@@ -61,7 +61,7 @@ export function spawnMiner(spawn: StructureSpawn, source: Source): void {
   const creepName = 'Miner_' + Game.time.toString();
   const creepMem: MinerMemory = {
     role: Role.miner,
-    target: source.id,
+    source: source.id,
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

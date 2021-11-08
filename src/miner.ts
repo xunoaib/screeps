@@ -1,9 +1,9 @@
-import { goHarvest, goTo } from "CreepActions";
+import { findSourceContainer, goHarvest, goTo } from "CreepActions";
 import { Role } from "creepConstants";
 
 export interface MinerMemory extends CreepMemory {
   role: Role.miner,
-  target: Id<Source>;
+  source: Id<Source>;
   container?: Id<StructureContainer>;
 }
 
@@ -20,14 +20,20 @@ const roleMiner = {
         creep.moveTo(container.pos);
       }
     } else { // memory unset, so look for a container
-      this.findMiningLocation(creep);
+      this.findNearbyContainer(creep);
     }
 
-    // find/target energy source
-    const target = Game.getObjectById(creep.memory.target as Id<Source>);
-    if (!target) {
-      console.log(creep.name + " has unknown target");
-      this.findMiningLocation(creep);
+    // focus energy source, or find a new one
+    const source = Game.getObjectById(creep.memory.source);
+    if (!source) {
+      console.log(creep.name + " has unknown source");
+
+      // find a new source
+      const target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+      if (target) {
+        creep.memory.source = target.id
+        this.findNearbyContainer(creep);
+      }
       return;
     }
 
@@ -46,7 +52,7 @@ const roleMiner = {
     }
 
     // continue harvesting
-    const result = goHarvest(creep, target);
+    const result = goHarvest(creep, source);
     if (result != OK) {
       if (result != ERR_NO_PATH) {
         console.log("Error harvesting: " + result);
@@ -55,26 +61,15 @@ const roleMiner = {
     }
    },
 
-  findMiningLocation(creep: Miner) {
-    const target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+  /** find new container location */
+  findNearbyContainer(creep: Miner) {
+    const target = Game.getObjectById(creep.memory.source);
     if (!target) return;
 
-    // set target source
-    creep.memory.target = target.id;
-
-    // look for nearby structures
-    const containers = target.room.lookForAtArea(LOOK_STRUCTURES,
-      target.pos.y-1,
-      target.pos.x-1,
-      target.pos.y+1,
-      target.pos.x+1,
-      true
-    );
-
-    // select the first container found, if any
-    const result = _.find(containers, (result) => (result.structure.structureType == STRUCTURE_CONTAINER));
-    if (result) {
-      creep.memory.container = result.structure.id as Id<StructureContainer>;
+    // look for containers adjacent to source
+    const container = findSourceContainer(target);
+    if (container) {
+      creep.memory.container = container.structure.id as Id<StructureContainer>;
     }
   }
 }
