@@ -32,7 +32,8 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn enough miners for each source
-  if (miners.length < sources.length) {
+  // TODO: wait for desired energy amount
+  if (miners.length < sources.length && miners.length <= scavengers.length) {
     const minedSources  = _.map(miners, miner => Game.getObjectById(miner.memory.source));
     const freeSources = _.difference(sources, minedSources);
 
