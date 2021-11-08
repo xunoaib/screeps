@@ -1,5 +1,5 @@
-import { HarvesterMemory } from "harvester";
-import { BuilderMemory } from "builder";
+import { Harvester, HarvesterMemory } from "harvester";
+import { Builder, BuilderMemory } from "builder";
 import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
 import { Scavenger } from "scavenger";
@@ -18,16 +18,16 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return;
 
   const creepCount    = _.size(Game.creeps);
-  const numHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == Role.harvester).length;
-  const numBuilders   = _.filter(Game.creeps, (creep) => creep.memory.role == Role.builder).length;
+  const harvesters    = _.filter(Game.creeps, (creep) => creep.memory.role == Role.harvester) as Harvester[];
+  const builders      = _.filter(Game.creeps, (creep) => creep.memory.role == Role.builder) as Builder[];
   const miners        = _.filter(Game.creeps, (creep) => creep.memory.role == Role.miner) as Miner[];
   const scavengers    = _.filter(Game.creeps, (creep) => creep.memory.role == Role.scavenger) as Scavenger[];
-  const sources        = spawn.room.find(FIND_SOURCES_ACTIVE);
+  const sources       = spawn.room.find(FIND_SOURCES_ACTIVE);
 
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
 
   // ensure a minimum number of harvesters
-  if (numHarvesters < 1) {
+  if (harvesters.length < 1) {
     return spawnHarvester(spawn);
   }
 
@@ -41,18 +41,18 @@ export function handleSpawn(spawn: StructureSpawn): void {
       return spawnMiner(spawn, freeSources[0]);
   }
 
-  // spawn harvesters to accommodate miners and dropped energy
+  // spawn scavengers to accommodate miners
   if (scavengers.length == 0 || scavengers.length < miners.length * 2) {
     return spawnScavenger(spawn);
   }
 
   // spawn one builder for every three sites, but enforce a maximum
-  if (sites.length && numBuilders < 4 && numBuilders * 3 < sites.length) {
+  if (sites.length && builders.length < 4 && builders.length * 3 < sites.length) {
     return spawnBuilder(spawn);
   }
 
   // spawn extra harvesters otherwise
-  if (numHarvesters < 3) {
+  if (harvesters.length < 3) {
     return spawnHarvester(spawn);
   }
 
