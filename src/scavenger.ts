@@ -88,7 +88,8 @@ const roleScavenger = {
     let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: (structure) => ((structure instanceof StructureSpawn || 
         structure instanceof StructureExtension || 
-        structure instanceof StructureContainer) &&
+        structure instanceof StructureContainer ||
+        structure instanceof StructureStorage) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
       )
     }) as (EnergyStructure | null);

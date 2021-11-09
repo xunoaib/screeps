@@ -3,7 +3,7 @@ import { Role } from "creepConstants";
 
 export interface BuilderMemory extends CreepMemory {
   role: Role.builder;
-  target: Id<StructureContainer|Source|ConstructionSite>;
+  target: Id<StructureContainer|StructureStorage|Source|ConstructionSite>;
   harvesting: boolean; // when not harvesting, building
 }
 
@@ -13,7 +13,7 @@ export interface Builder extends Creep {
 
 const roleBuilder = {
   run(creep: Builder): void {
-    const target = Game.getObjectById(creep.memory.target as Id<StructureContainer|Source|ConstructionSite>);
+    const target = Game.getObjectById(creep.memory.target);
     if (!target) { // construction site complete / container destroyed
       if (!this.focusConstructionSite(creep))
         console.log(creep.name + " has no more sites");
@@ -28,7 +28,7 @@ const roleBuilder = {
       }
 
       // withdraw or harvest
-      if (target instanceof StructureContainer) {
+      if (target instanceof StructureContainer || target instanceof StructureStorage) {
         const result = goWithdraw(creep, target, RESOURCE_ENERGY);
         if (result != OK) {
           console.log(creep.name + " error withdrawing: " + result);
@@ -77,10 +77,10 @@ const roleBuilder = {
   focusEnergySource(creep: Builder): boolean {
     // look for container with more than a given amount of energy
     const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: (structure) => (structure.structureType == STRUCTURE_CONTAINER &&
-        // TODO: container.usedEnergy >= creep.energyCapacity
+      filter: (structure) => ((
+        structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
         structure.store.getUsedCapacity(RESOURCE_ENERGY) / structure.store.getCapacity(RESOURCE_ENERGY) > 0.15)
-    }) as StructureContainer | null;
+    }) as StructureContainer | StructureStorage | null;
 
     if (container) {
       creep.memory.target = container.id;
