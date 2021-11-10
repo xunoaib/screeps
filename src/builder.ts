@@ -1,9 +1,9 @@
-import { findClosestConstructionSites, goBuild, goHarvest, goWithdraw } from "CreepActions";
+import { findClosestConstructionSites, goBuild, goHarvest, goPickup, goWithdraw } from "CreepActions";
 import { Role } from "creepConstants";
 
 export interface BuilderMemory extends CreepMemory {
   role: Role.builder;
-  target: Id<StructureContainer | StructureStorage | Source | ConstructionSite>;
+  target: Id<StructureContainer | StructureStorage | Source | ConstructionSite | Resource>;
   harvesting: boolean; // when not harvesting, building
 }
 
@@ -32,6 +32,11 @@ const roleBuilder = {
         const result = goWithdraw(creep, target, RESOURCE_ENERGY);
         if (result != OK) {
           console.log(creep.name + " error withdrawing: " + result);
+        }
+      } else if (target instanceof Resource) {
+        const result = goPickup(creep, target);
+        if (result != OK && result != ERR_NO_PATH) {
+          console.log(creep.name + " error picking up energy");
         }
       } else if (target instanceof Source) {
         const result = goHarvest(creep, target);
@@ -85,6 +90,16 @@ const roleBuilder = {
 
     if (container) {
       creep.memory.target = container.id;
+      creep.memory.harvesting = true;
+      return true;
+    }
+
+    // look for dropped energy
+    const resource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+      filter: resource => resource.resourceType == RESOURCE_ENERGY
+    });
+    if (resource) {
+      creep.memory.target = resource.id;
       creep.memory.harvesting = true;
       return true;
     }
