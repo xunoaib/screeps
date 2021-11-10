@@ -14,15 +14,14 @@ export function handleRoomSpawns(room: Room): void {
 }
 
 export function handleSpawn(spawn: StructureSpawn): void {
-  if (spawn.spawning)
-    return;
+  if (spawn.spawning) return;
 
-  const creepCount    = _.size(Game.creeps);
-  const harvesters    = _.filter(Game.creeps, (creep) => creep.memory.role == Role.harvester) as Harvester[];
-  const builders      = _.filter(Game.creeps, (creep) => creep.memory.role == Role.builder) as Builder[];
-  const miners        = _.filter(Game.creeps, (creep) => creep.memory.role == Role.miner) as Miner[];
-  const scavengers    = _.filter(Game.creeps, (creep) => creep.memory.role == Role.scavenger) as Scavenger[];
-  const sources       = spawn.room.find(FIND_SOURCES_ACTIVE);
+  const creepCount = _.size(Game.creeps);
+  const harvesters = _.filter(Game.creeps, creep => creep.memory.role == Role.harvester) as Harvester[];
+  const builders = _.filter(Game.creeps, creep => creep.memory.role == Role.builder) as Builder[];
+  const miners = _.filter(Game.creeps, creep => creep.memory.role == Role.miner) as Miner[];
+  const scavengers = _.filter(Game.creeps, creep => creep.memory.role == Role.scavenger) as Scavenger[];
+  const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
 
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
 
@@ -34,12 +33,11 @@ export function handleSpawn(spawn: StructureSpawn): void {
   // spawn enough miners for each source
   // TODO: wait for desired energy amount
   if (miners.length < sources.length && miners.length <= scavengers.length) {
-    const minedSources  = _.map(miners, miner => Game.getObjectById(miner.memory.source));
+    const minedSources = _.map(miners, miner => Game.getObjectById(miner.memory.source));
     const freeSources = _.difference(sources, minedSources);
 
     // look for unmined sources
-    if (freeSources.length && freeSources[0])
-      return spawnMiner(spawn, freeSources[0]);
+    if (freeSources.length && freeSources[0]) return spawnMiner(spawn, freeSources[0]);
   }
 
   // spawn scavengers to accommodate miners
@@ -64,10 +62,10 @@ export function handleSpawn(spawn: StructureSpawn): void {
 
 export function spawnMiner(spawn: StructureSpawn, source: Source): void {
   const creepParts = generateMinerBody(spawn.room.energyAvailable);
-  const creepName = 'Miner_' + Game.time.toString();
+  const creepName = "Miner_" + Game.time.toString();
   const creepMem: MinerMemory = {
     role: Role.miner,
-    source: source.id,
+    source: source.id
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
@@ -75,10 +73,10 @@ export function spawnMiner(spawn: StructureSpawn, source: Source): void {
 
 export function spawnScavenger(spawn: StructureSpawn): void {
   const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE];
-  const creepName = 'Scavenger_' + Game.time.toString();
+  const creepName = "Scavenger_" + Game.time.toString();
   const creepMem = {
     role: Role.scavenger,
-    delivering: false,
+    delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
@@ -92,11 +90,11 @@ export function spawnHarvester(spawn: StructureSpawn): void {
   }
 
   const creepParts = [WORK, WORK, CARRY, MOVE];
-  const creepName = 'Harvester_' + Game.time.toString();
+  const creepName = "Harvester_" + Game.time.toString();
   const creepMem: HarvesterMemory = {
     role: Role.harvester,
     harvesting: true,
-    target: source.id,
+    target: source.id
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
@@ -104,10 +102,10 @@ export function spawnHarvester(spawn: StructureSpawn): void {
 
 export function spawnBuilder(spawn: StructureSpawn): void {
   const creepParts = [WORK, WORK, CARRY, MOVE];
-  const creepName = 'Builder_' + Game.time.toString();
+  const creepName = "Builder_" + Game.time.toString();
   const creepMem = {
     role: Role.builder,
-    harvesting: false,
+    harvesting: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

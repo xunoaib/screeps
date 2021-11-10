@@ -1,5 +1,5 @@
 import { EnergyStructure } from "filters";
-import { goHarvest, goTransfer, findEnergyTarget, RANGES, goRepair, goPickup } from "CreepActions";
+import { RANGES, findEnergyTarget, goHarvest, goPickup, goRepair, goTransfer } from "CreepActions";
 import { Role } from "creepConstants";
 
 // TODO: findResources should include ruins
@@ -54,7 +54,7 @@ const roleScavenger = {
     // creep is full, find place to deposit
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
       this.findDepoTarget(creep);
-      return
+      return;
     }
 
     // resource disappeared, find another
@@ -86,19 +86,18 @@ const roleScavenger = {
   /** deposit at nearest spawn/extension/container in need of energy, then controller */
   findDepoTarget(creep: Scavenger) {
     let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: (structure) => ((structure instanceof StructureSpawn || 
-        structure instanceof StructureExtension || 
-        structure instanceof StructureContainer ||
-        structure instanceof StructureStorage) &&
+      filter: structure =>
+        (structure instanceof StructureSpawn ||
+          structure instanceof StructureExtension ||
+          structure instanceof StructureContainer ||
+          structure instanceof StructureStorage) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-      )
-    }) as (EnergyStructure | null);
+    }) as EnergyStructure | null;
 
     // fall back to towers
     target ??= creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-      filter: (structure) => (structure instanceof StructureTower &&
-        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
-    }) as (StructureTower | null);
+      filter: structure => structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    });
 
     // fall back to controller
     if (!target && creep.room.controller && creep.room.controller.my) {
@@ -113,6 +112,6 @@ const roleScavenger = {
       creep.say("🚬");
     }
   }
-}
+};
 
 export default roleScavenger;

@@ -7,8 +7,8 @@ export const RANGES = {
   WITHDRAW: 1,
   UPGRADE: 3,
   BUILD: 3,
-  REPAIR: 3,
-}
+  REPAIR: 3
+};
 
 export function goHarvest(creep: Creep, source: Source) {
   if (creep.pos.inRangeTo(source.pos, RANGES.HARVEST)) {
@@ -26,7 +26,13 @@ export function goPickup(creep: Creep, resource: Resource) {
   }
 }
 
-export function goTransfer(creep: Creep, target: Creep | PowerCreep | Structure, resource: ResourceConstant, amount?: number, range?: number) {
+export function goTransfer(
+  creep: Creep,
+  target: Creep | PowerCreep | Structure,
+  resource: ResourceConstant,
+  amount?: number,
+  range?: number
+) {
   if (creep.pos.inRangeTo(target.pos, range ?? RANGES.TRANSFER)) {
     return creep.transfer(target, resource, amount);
   } else {
@@ -43,8 +49,7 @@ export function goWithdraw(creep: Creep, target: EnergyStructure, resource: Reso
 }
 
 export function goTo(creep: Creep, pos: RoomPosition | { pos: RoomPosition }) {
-  if (creep.fatigue == 0)
-    return creep.moveTo(pos, { visualizePathStyle: { stroke: '#ccc' } });
+  if (creep.fatigue == 0) return creep.moveTo(pos, { visualizePathStyle: { stroke: "#ccc" } });
   return OK;
 }
 
@@ -67,28 +72,28 @@ export function goRepair(creep: Creep, target: Structure) {
 // find energy storage target and enter depositing state
 export function findEnergyTarget(room: Room): Structure | null {
   // try to fill spawns
-  const spawns = room.find(FIND_MY_SPAWNS,
-    {filter: (s: StructureSpawn) => s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}
-  ) as StructureSpawn[];
+  const spawns = room.find(FIND_MY_SPAWNS, {
+    filter: (s: StructureSpawn) => s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+  });
 
-  if (spawns.length)
-    return spawns[0];
+  if (spawns.length) return spawns[0];
 
   // then extensions
-  const extensions = room.find(FIND_MY_STRUCTURES,
-    {filter: (s: StructureExtension) => s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}
-  ) as StructureExtension[];
+  const extensions = room.find(FIND_MY_STRUCTURES, {
+    filter: (s: StructureExtension) =>
+      s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+  });
   const rankedExtensions = extensions.sort((s: StructureExtension) => s.store.getFreeCapacity(RESOURCE_ENERGY));
 
-  if (rankedExtensions.length)
-    return rankedExtensions[0];
+  if (rankedExtensions.length) return rankedExtensions[0];
 
   // repairable objects (below 75%)
-  const repairable = room.find(FIND_STRUCTURES, {
-    filter: (s: Structure) => (s.hits / s.hitsMax < 0.75)
-  }).sort(s => s.hits / s.hitsMax);
-  if (repairable.length)
-    return repairable[0];
+  const repairable = room
+    .find(FIND_STRUCTURES, {
+      filter: (s: Structure) => s.hits / s.hitsMax < 0.75
+    })
+    .sort(s => s.hits / s.hitsMax);
+  if (repairable.length) return repairable[0];
 
   // then room controller
   return room.controller ?? null;
@@ -96,19 +101,20 @@ export function findEnergyTarget(room: Room): Structure | null {
 
 export function findClosestConstructionSites(room: Room, pos: RoomPosition): ConstructionSite[] {
   const sites = room.find(FIND_CONSTRUCTION_SITES);
-  return _.sortBy(sites, (site) => site.pos.getRangeTo(pos));
+  return _.sortBy(sites, site => site.pos.getRangeTo(pos));
 }
 
 export function findSourceContainer(target: RoomObject) {
   if (!target.room) return;
 
-  const containers = target.room.lookForAtArea(LOOK_STRUCTURES,
-    target.pos.y-1,
-    target.pos.x-1,
-    target.pos.y+1,
-    target.pos.x+1,
+  const containers = target.room.lookForAtArea(
+    LOOK_STRUCTURES,
+    target.pos.y - 1,
+    target.pos.x - 1,
+    target.pos.y + 1,
+    target.pos.x + 1,
     true
   );
 
-  return _.find(containers, (result) => (result.structure.structureType == STRUCTURE_CONTAINER));
+  return _.find(containers, result => result.structure.structureType == STRUCTURE_CONTAINER);
 }

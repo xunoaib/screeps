@@ -17,7 +17,7 @@ export class RoomManager {
     this.constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES);
     this.structures = this.room.find(FIND_MY_STRUCTURES);
 
-    const creepsByRole = _.groupBy(this.creeps, (creep) => creep.memory.role);
+    const creepsByRole = _.groupBy(this.creeps, creep => creep.memory.role);
     this.harvesters = creepsByRole[Role.harvester] as Harvester[];
   }
 }

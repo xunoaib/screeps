@@ -40,8 +40,7 @@ export function runRoomCreepLogic(room: Room): void {
 }
 
 export function runCreepLogic(creep: Creep): void {
-  if (creep.spawning)
-    return;
+  if (creep.spawning) return;
 
   switch (creep.memory.role) {
     case Role.harvester: {
@@ -62,7 +61,6 @@ export function runCreepLogic(creep: Creep): void {
   }
 }
 
-
 export function runAllDefenses() {
   _.map(Game.rooms, runRoomDefenses);
 }
@@ -72,11 +70,11 @@ export function runRoomDefenses(room: Room) {
   if (!invaders) return;
 
   const towers = room.find(FIND_MY_STRUCTURES, {
-    filter: (tower) => tower.structureType == STRUCTURE_TOWER
-  }) as StructureTower[];
+    filter: tower => tower.structureType == STRUCTURE_TOWER
+  });
 
   // TODO: only attack at close range
-  _.forEach(towers, (tower) => tower.attack(invaders[0]));
+  _.forEach(towers, tower => tower.attack(invaders[0]));
 }
 
 // automatically delete memory of missing creeps
@@ -106,6 +104,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
   runAllCreepLogic();
   cleanup();
 
-  if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST)
-    Game.cpu.generatePixel();
+  if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST) Game.cpu.generatePixel();
 });
