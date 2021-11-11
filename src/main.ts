@@ -70,10 +70,9 @@ export function runRoomDefenses(room: Room) {
   if (!invaders) return;
 
   const towers = room.find(FIND_MY_STRUCTURES, {
-    filter: tower => tower.structureType == STRUCTURE_TOWER
-  });
+    filter: tower => tower instanceof StructureTower
+  }) as StructureTower[];
 
-  // TODO: only attack at close range
   _.forEach(towers, tower => tower.attack(invaders[0]));
 }
 

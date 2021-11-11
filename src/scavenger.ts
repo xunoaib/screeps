@@ -97,7 +97,7 @@ const roleScavenger = {
     // fall back to towers
     target ??= creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure => structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    });
+    }) as StructureTower;
 
     // fall back to controller
     if (!target && creep.room.controller && creep.room.controller.my) {

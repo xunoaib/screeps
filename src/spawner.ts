@@ -31,14 +31,17 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn enough miners for each source
-  // TODO: wait for desired energy amount
   if (miners.length < sources.length && miners.length <= scavengers.length) {
     const minedSources = _.map(miners, miner => Game.getObjectById(miner.memory.source));
     const freeSources = _.difference(sources, minedSources);
 
     // look for unmined sources
-    if (freeSources.length && freeSources[0]) return spawnMiner(spawn, freeSources[0]);
+    if (freeSources.length && freeSources[0])
+      spawnMiner(spawn, freeSources[0]);
+    return;
   }
+
+  // TODO: spawn builders early instead of scavengers
 
   // spawn scavengers to accommodate miners
   if (scavengers.length == 0 || scavengers.length < miners.length * 2) {
@@ -101,7 +104,7 @@ export function spawnHarvester(spawn: StructureSpawn): void {
 }
 
 export function spawnBuilder(spawn: StructureSpawn): void {
-  const creepParts = [WORK, WORK, CARRY, MOVE];
+  const creepParts = [WORK, WORK, CARRY, CARRY, MOVE];
   const creepName = "Builder_" + Game.time.toString();
   const creepMem = {
     role: Role.builder,
