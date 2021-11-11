@@ -85,8 +85,9 @@ const roleBuilder = {
     const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
         (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) / structure.store.getCapacity(RESOURCE_ENERGY) > 0.15
-    });
+        (structure.store.getUsedCapacity(RESOURCE_ENERGY) / structure.store.getCapacity(RESOURCE_ENERGY) > 0.15 ||
+          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 350)
+    }) as StructureContainer | StructureStorage | null;
 
     if (container) {
       creep.memory.target = container.id;
