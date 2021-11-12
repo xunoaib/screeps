@@ -83,21 +83,28 @@ const roleScavenger = {
     } // else: no resources found
   },
 
-  /** deposit at nearest spawn/extension/container in need of energy, then controller */
+  /** find targets in need of energy */
   findDepoTarget(creep: Scavenger) {
+    // refill spawn/extensions
     let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
         (structure instanceof StructureSpawn ||
-          structure instanceof StructureExtension ||
-          structure instanceof StructureContainer ||
-          structure instanceof StructureStorage) &&
+          structure instanceof StructureExtension) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | null;
 
-    // fall back to towers
+    // refill towers
     target ??= creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure => structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as StructureTower;
+
+    // refill containers/storage
+    target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {
+      filter: structure =>
+          (structure instanceof StructureContainer ||
+          structure instanceof StructureStorage) &&
+        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    }) as EnergyStructure | null;
 
     // fall back to controller
     if (!target && creep.room.controller && creep.room.controller.my) {
