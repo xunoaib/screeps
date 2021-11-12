@@ -76,6 +76,23 @@ export function runRoomDefenses(room: Room) {
   _.forEach(towers, tower => tower.attack(invaders[0]));
 }
 
+export function runAllTowerRepairs() {
+  _.map(Game.rooms, runTowerRepairs);
+}
+
+export function runTowerRepairs(room: Room) {
+  // only repair when there's surplus energy
+  const towers = room.find(FIND_MY_STRUCTURES, {
+    filter: tower => tower instanceof StructureTower && tower.store.energy > 100
+  }) as StructureTower[];
+
+  const repairables = room.find(FIND_STRUCTURES, {
+    filter: structure => structure.hits < structure.hitsMax
+  }).sort((a, b) => b.hits - a.hits);
+
+  _.forEach(towers, tower => tower.repair(repairables[0]));
+}
+
 // automatically delete memory of missing creeps
 export function cleanup() {
   for (const name in Memory.creeps) {
@@ -99,6 +116,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   setupGlobalCache();
   runAllDefenses();
+  runAllTowerRepairs();
   handleAllSpawns();
   runAllCreepLogic();
   cleanup();
