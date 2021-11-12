@@ -73,9 +73,11 @@ const roleScavenger = {
     }
   },
 
-  /** scavenge nearest dropped resources */
+  /** scavenge nearest dropped energy */
   findResources(creep: Scavenger) {
-    const resource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+    const resource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+      filter: resource => resource.resourceType == RESOURCE_ENERGY
+    });
     if (resource) {
       creep.memory.resource = resource.id;
       creep.memory.delivering = false;
