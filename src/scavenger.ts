@@ -1,5 +1,5 @@
 import { EnergyStructure } from "filters";
-import { RANGES, findEnergyTarget, goHarvest, goPickup, goRepair, goTransfer } from "CreepActions";
+import { RANGES, goPickup, goTransfer } from "CreepActions";
 import { Role } from "creepConstants";
 
 // TODO: findResources should include ruins
@@ -42,7 +42,6 @@ const roleScavenger = {
     const result = goTransfer(creep, target, RESOURCE_ENERGY, undefined, range);
     if (result != OK) {
       if (ERR_FULL) {
-        console.log(creep.name + ": target full, redirecting");
         this.findDepoTarget(creep);
       } else {
         console.log(creep.name + ": error transferring dropped resources: " + result + " @ " + range);

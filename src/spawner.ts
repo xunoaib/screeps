@@ -26,7 +26,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
 
   // ensure a minimum number of harvesters
-  if (harvesters.length < 1) {
+  if (harvesters.length < 2) {
     return spawnHarvester(spawn);
   }
 
@@ -49,7 +49,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn one builder for every three sites, but enforce a maximum
-  if (sites.length && builders.length < 4 && builders.length * 3 < sites.length) {
+  if (sites.length && builders.length < 3 && builders.length * 3 < sites.length) {
     return spawnBuilder(spawn);
   }
 
@@ -58,7 +58,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return spawnHarvester(spawn);
   }
 
-  if (scavengers.length < 9) {
+  if (scavengers.length < miners.length * 2 + 5) {
     return spawnScavenger(spawn);
   }
 }

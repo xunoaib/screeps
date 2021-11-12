@@ -15,8 +15,7 @@ const roleBuilder = {
   run(creep: Builder): void {
     const target = Game.getObjectById(creep.memory.target);
     if (!target) {
-      // construction site complete / container destroyed
-      if (!this.focusConstructionSite(creep)) console.log(creep.name + " has no more sites");
+      this.focusConstructionSite(creep)
       return;
     }
 
@@ -75,8 +74,7 @@ const roleBuilder = {
       creep.memory.harvesting = false;
       return true;
     } else {
-      console.log("No construction sites found");
-      return false;
+      return false; // no sites
     }
   },
 

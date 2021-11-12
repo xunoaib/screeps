@@ -72,7 +72,7 @@ const roleHarvester = {
           }
         } // else: wait for spawn to spawn
       } else if (result == ERR_INVALID_TARGET) {
-        console.log("Invalid target. Finding new one");
+        console.log(creep.name + ": invalid target. finding new one");
         this.focusTarget(creep);
       } else if (result != OK) {
         console.log("Error transferring: " + result);
