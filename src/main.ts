@@ -69,7 +69,7 @@ export function runRoomDefenses(room: Room) {
   const invaders = room.find(FIND_HOSTILE_CREEPS).sort((a, b) => b.hits - a.hits);
   if (!invaders) return;
 
-  const towers = room.find(FIND_MY_STRUCTURES, {
+  const towers: StructureTower[] = room.find(FIND_MY_STRUCTURES, {
     filter: tower => tower instanceof StructureTower
   });
 
@@ -82,7 +82,7 @@ export function runAllTowerRepairs() {
 
 export function runTowerRepairs(room: Room) {
   // only repair when there's surplus energy
-  const towers = room.find(FIND_MY_STRUCTURES, {
+  const towers: StructureTower[] = room.find(FIND_MY_STRUCTURES, {
     filter: tower => tower instanceof StructureTower && tower.store.energy > 100
   });
 
