@@ -87,8 +87,7 @@ const roleScavenger = {
     // refill spawn/extensions
     let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
-        (structure instanceof StructureSpawn ||
-          structure instanceof StructureExtension) &&
+        (structure instanceof StructureSpawn || structure instanceof StructureExtension) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | null;
 
@@ -100,8 +99,7 @@ const roleScavenger = {
     // refill containers/storage
     target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
-          (structure instanceof StructureContainer ||
-          structure instanceof StructureStorage) &&
+        (structure instanceof StructureContainer || structure instanceof StructureStorage) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | null;
 

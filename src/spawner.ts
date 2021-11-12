@@ -36,8 +36,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
     const freeSources = _.difference(sources, minedSources);
 
     // look for unmined sources
-    if (freeSources.length && freeSources[0])
-      spawnMiner(spawn, freeSources[0]);
+    if (freeSources.length && freeSources[0]) spawnMiner(spawn, freeSources[0]);
     return;
   }
 

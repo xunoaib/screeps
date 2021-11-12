@@ -15,7 +15,7 @@ const roleBuilder = {
   run(creep: Builder): void {
     const target = Game.getObjectById(creep.memory.target);
     if (!target) {
-      this.focusConstructionSite(creep)
+      this.focusConstructionSite(creep);
       return;
     }
 
@@ -85,7 +85,7 @@ const roleBuilder = {
         (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
         (structure.store.getUsedCapacity(RESOURCE_ENERGY) / structure.store.getCapacity(RESOURCE_ENERGY) > 0.15 ||
           structure.store.getUsedCapacity(RESOURCE_ENERGY) > 350)
-    }) as StructureContainer | StructureStorage | null;
+    });
 
     if (container) {
       creep.memory.target = container.id;

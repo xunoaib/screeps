@@ -81,7 +81,7 @@ export function findEnergyTarget(room: Room): Structure | null {
   // then extensions
   const extensions = room.find(FIND_MY_STRUCTURES, {
     filter: s => s instanceof StructureExtension && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-  }) as StructureExtension[];
+  });
   const rankedExtensions = extensions.sort(s => s.store.getFreeCapacity(RESOURCE_ENERGY));
 
   if (rankedExtensions.length) return rankedExtensions[0];
