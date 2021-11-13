@@ -72,7 +72,11 @@ const roleHauler = {
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) != 0) {
       // cant withdraw from depot (out of energy, etc)
       if (goWithdraw(creep, target, RESOURCE_ENERGY) != OK) {
-        this.focusSourceContainer(creep);
+        if (creep.store.energy > 0)
+          this.focusTargetContainer(creep);
+        else
+          this.focusSourceContainer(creep);
+        this.run(creep);
       }
     } else {
       this.focusTargetContainer(creep);
