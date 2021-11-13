@@ -5,6 +5,7 @@ import { Miner, MinerMemory } from "miner";
 import { Scavenger } from "scavenger";
 import { Hauler } from "hauler";
 import { generateMinerBody } from "creepBody";
+import { Refiller } from "refiller";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -23,6 +24,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const miners = _.filter(Game.creeps, creep => creep.memory.role == Role.miner) as Miner[];
   const scavengers = _.filter(Game.creeps, creep => creep.memory.role == Role.scavenger) as Scavenger[];
   const haulers = _.filter(Game.creeps, creep => creep.memory.role == Role.hauler) as Hauler[];
+  const refillers = _.filter(Game.creeps, creep => creep.memory.role == Role.refiller) as Refiller[];
 
   const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
@@ -56,6 +58,10 @@ export function handleSpawn(spawn: StructureSpawn): void {
   // spawn one builder for every three sites, but enforce a maximum
   if (sites.length && builders.length < 3 && builders.length * 3 < sites.length) {
     return spawnBuilder(spawn);
+  }
+
+  if (refillers.length < 1 && spawn.room.storage && containers.length) {
+    return spawnRefiller(spawn);
   }
 
   // spawn haulers to move energy into room storage
@@ -129,6 +135,17 @@ export function spawnHauler(spawn: StructureSpawn): void {
   const creepName = "Hauler_" + Game.time.toString();
   const creepMem = {
     role: Role.hauler,
+    delivering: false
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnRefiller(spawn: StructureSpawn): void {
+  const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE];
+  const creepName = "Refiller_" + Game.time.toString();
+  const creepMem = {
+    role: Role.refiller,
     delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
