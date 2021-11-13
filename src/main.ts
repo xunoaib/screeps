@@ -121,8 +121,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
   console.log(`<font color="green"><strong>Current game tick is ${Game.time}</strong></font>`);
 
   setupGlobalCache();
-  runAllDefenses();
   runAllTowerRepairs();
+  runAllDefenses();
   handleAllSpawns();
   runAllCreepLogic();
   cleanup();
