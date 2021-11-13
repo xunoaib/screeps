@@ -2,8 +2,6 @@ import { EnergyStructure } from "filters";
 import { RANGES, goPickup, goTransfer } from "CreepActions";
 import { Role } from "creepConstants";
 
-// TODO: findResources should include ruins
-
 export interface ScavengerMemory extends CreepMemory {
   role: Role.harvester;
   resource: Id<Resource>;
@@ -25,18 +23,20 @@ const roleScavenger = {
   },
 
   doDeliver(creep: Scavenger) {
-    // finished delivering, now find more resources
-    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+    // dereference delivery target
+    const target = Game.getObjectById(creep.memory.target);
+    if (!target) {
+      console.log(creep.name + ": error delivering");
+      this.findDepoTarget(creep);
+      return;
+    }
+
+    // finished delivering all resources
+    if (creep.store.energy == 0) {
       this.findResources(creep);
       return;
     }
 
-    // otherwise, continue delivering
-    const target = Game.getObjectById(creep.memory.target);
-    if (!target) {
-      console.log(creep.name + ": error delivering");
-      return;
-    }
     // upgrade or transfer to target
     const range = target.structureType == STRUCTURE_CONTROLLER ? RANGES.UPGRADE : RANGES.TRANSFER;
     const result = goTransfer(creep, target, RESOURCE_ENERGY, undefined, range);
@@ -84,10 +84,10 @@ const roleScavenger = {
     } // else: no resources found
   },
 
-  /** find targets in need of energy */
+  /** find resource delivery targets */
   findDepoTarget(creep: Scavenger) {
     // refill spawn/extensions
-    let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    let target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure =>
         (structure instanceof StructureSpawn || structure instanceof StructureExtension) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
