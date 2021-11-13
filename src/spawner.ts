@@ -6,6 +6,7 @@ import { Scavenger } from "scavenger";
 import { Hauler } from "hauler";
 import { generateMinerBody } from "creepBody";
 import { Refiller } from "refiller";
+import { Upgrader } from "upgrader";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -25,6 +26,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const scavengers = _.filter(Game.creeps, creep => creep.memory.role == Role.scavenger) as Scavenger[];
   const haulers = _.filter(Game.creeps, creep => creep.memory.role == Role.hauler) as Hauler[];
   const refillers = _.filter(Game.creeps, creep => creep.memory.role == Role.refiller) as Refiller[];
+  const upgraders = _.filter(Game.creeps, creep => creep.memory.role == Role.upgrader) as Upgrader[];
 
   const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
@@ -67,6 +69,10 @@ export function handleSpawn(spawn: StructureSpawn): void {
   // spawn haulers to move energy into room storage
   if (haulers.length < 4 && spawn.room.storage && _.filter(containers, container => container.store.energy > 200).length > 0) {
     return spawnHauler(spawn);
+  }
+
+  if (upgraders.length < 4) {
+    return spawnUpgrader(spawn);
   }
 
   // spawn extra harvesters otherwise
@@ -146,6 +152,17 @@ export function spawnRefiller(spawn: StructureSpawn): void {
   const creepName = "Refiller_" + Game.time.toString();
   const creepMem = {
     role: Role.refiller,
+    delivering: false
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnUpgrader(spawn: StructureSpawn): void {
+  const creepParts = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]; // XXX: scaling body
+  const creepName = "Upgrader_" + Game.time.toString();
+  const creepMem = {
+    role: Role.upgrader,
     delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };

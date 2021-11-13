@@ -40,7 +40,15 @@ export function goTransfer(
   }
 }
 
-export function goWithdraw(creep: Creep, target: EnergyStructure, resource: ResourceConstant, amount?: number) {
+export function goUpgrade(creep: Creep, target: StructureController) {
+  if (creep.pos.inRangeTo(target.pos, RANGES.UPGRADE)) {
+    return creep.upgradeController(target);
+  } else {
+    return goTo(creep, target);
+  }
+}
+
+export function goWithdraw(creep: Creep, target: EnergyStructure | Tombstone, resource: ResourceConstant, amount?: number) {
   if (creep.pos.inRangeTo(target.pos, RANGES.WITHDRAW)) {
     return creep.withdraw(target, resource, amount);
   } else {

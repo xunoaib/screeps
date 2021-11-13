@@ -8,6 +8,7 @@ import roleMiner, { Miner } from "miner";
 import roleScavenger, { Scavenger } from "scavenger";
 import roleHauler, { Hauler } from "hauler";
 import roleRefiller, { Refiller } from "refiller";
+import roleUpgrader, { Upgrader } from "upgrader";
 
 declare global {
   interface Memory {
@@ -62,6 +63,9 @@ export function runCreepLogic(creep: Creep): void {
     }
     case Role.refiller: {
       return roleRefiller.run(creep as Refiller);
+    }
+    case Role.upgrader: {
+      return roleUpgrader.run(creep as Upgrader);
     }
     default: {
       console.log(creep.name + " has an unknown role");
