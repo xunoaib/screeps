@@ -3,6 +3,7 @@ import { Builder, BuilderMemory } from "builder";
 import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
 import { Scavenger } from "scavenger";
+import { Hauler } from "hauler";
 import { generateMinerBody } from "creepBody";
 
 export function handleAllSpawns(): void {
@@ -21,9 +22,14 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const builders = _.filter(Game.creeps, creep => creep.memory.role == Role.builder) as Builder[];
   const miners = _.filter(Game.creeps, creep => creep.memory.role == Role.miner) as Miner[];
   const scavengers = _.filter(Game.creeps, creep => creep.memory.role == Role.scavenger) as Scavenger[];
-  const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
+  const haulers = _.filter(Game.creeps, creep => creep.memory.role == Role.hauler) as Hauler[];
 
+  const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
+
+  const containers = spawn.room.find(FIND_STRUCTURES, {
+    filter: structure => structure instanceof StructureContainer
+  }) as StructureContainer[];
 
   // ensure a minimum number of harvesters
   if (harvesters.length < 2) {
@@ -50,6 +56,11 @@ export function handleSpawn(spawn: StructureSpawn): void {
   // spawn one builder for every three sites, but enforce a maximum
   if (sites.length && builders.length < 3 && builders.length * 3 < sites.length) {
     return spawnBuilder(spawn);
+  }
+
+  // spawn haulers to move energy into room storage
+  if (haulers.length < 4 && spawn.room.storage && _.filter(containers, container => container.store.energy > 200).length > 0) {
+    return spawnHauler(spawn);
   }
 
   // spawn extra harvesters otherwise
@@ -108,6 +119,17 @@ export function spawnBuilder(spawn: StructureSpawn): void {
   const creepMem = {
     role: Role.builder,
     harvesting: false
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnHauler(spawn: StructureSpawn): void {
+  const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE];
+  const creepName = "Hauler_" + Game.time.toString();
+  const creepMem = {
+    role: Role.hauler,
+    delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

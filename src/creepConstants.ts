@@ -2,5 +2,6 @@ export enum Role {
   harvester = "harvester",
   builder = "builder",
   miner = "miner",
-  scavenger = "scavenger"
+  scavenger = "scavenger",
+  hauler = "hauler",
 }
