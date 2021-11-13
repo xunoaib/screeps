@@ -76,11 +76,9 @@ const roleHauler = {
           this.focusTargetContainer(creep);
         else
           this.focusSourceContainer(creep);
-        this.run(creep);
       }
     } else {
       this.focusTargetContainer(creep);
-      this.run(creep);
     }
   }
 };

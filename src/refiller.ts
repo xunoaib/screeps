@@ -68,7 +68,6 @@ const roleRefiller = {
       }
     } else {
       this.focusSourceContainer(creep);
-      this.run(creep);
     }
   },
 
@@ -83,7 +82,6 @@ const roleRefiller = {
       }
     } else {
       this.focusTargetContainer(creep);
-      this.run(creep);
     }
   }
 };
