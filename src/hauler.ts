@@ -64,7 +64,6 @@ const roleHauler = {
       }
     } else {
       this.focusSourceContainer(creep);
-      this.run(creep);
     }
   },
 
