@@ -31,7 +31,7 @@ const roleHauler = {
   focusSourceContainer(creep: Hauler) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure => structure instanceof StructureContainer &&
-        structure.store.energy > creep.store.getFreeCapacity(RESOURCE_ENERGY)
+        structure.store.energy > 250
     }) as StructureContainer | undefined;
 
     if (!target) return;
