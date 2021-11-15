@@ -56,13 +56,7 @@ const roleMiner = {
     }
 
     // continue harvesting
-    const result = goHarvest(creep, source);
-    if (result != OK) {
-      if (result != ERR_NO_PATH) {
-        console.log("Error harvesting: " + result);
-      }
-      return;
-    }
+    goHarvest(creep, source);
   },
 
   /** find new container location */

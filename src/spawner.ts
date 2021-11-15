@@ -4,7 +4,7 @@ import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
 import { Scavenger } from "scavenger";
 import { Hauler } from "hauler";
-import { generateMinerBody } from "creepBody";
+import { bodyCost, generateBody, generateMinerBody } from "creepBody";
 import { Refiller } from "refiller";
 import { Upgrader } from "upgrader";
 import { Claimer } from "claimer";
@@ -64,10 +64,10 @@ export function handleSpawn(spawn: StructureSpawn): void {
 
   // spawn one builder for every three sites, but enforce a maximum
   if (sites.length && builders.length < 3 && builders.length * 3 < sites.length) {
-    return spawnBuilder(spawn);
+    if (spawnBuilder(spawn)) return;
   }
 
-  if (refillers.length < 1 && spawn.room.storage && containers.length) {
+  if (refillers.length < 2 && containers.length) {
     return spawnRefiller(spawn);
   }
 
@@ -77,7 +77,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn haulers to move energy into room storage
-  if (haulers.length < 4 && spawn.room.storage && _.filter(containers, container => container.store.energy > 200).length > 0) {
+  if (haulers.length < 6 && spawn.room.storage && _.filter(containers, container => container.store.energy > 200).length > 0) {
     return spawnHauler(spawn);
   }
 
@@ -88,10 +88,6 @@ export function handleSpawn(spawn: StructureSpawn): void {
   // spawn extra harvesters otherwise
   if (harvesters.length < 3) {
     return spawnHarvester(spawn);
-  }
-
-  if (scavengers.length < miners.length * 2 + 5) {
-    return spawnScavenger(spawn);
   }
 }
 
@@ -135,7 +131,7 @@ export function spawnHarvester(spawn: StructureSpawn): void {
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
 }
 
-export function spawnBuilder(spawn: StructureSpawn): void {
+export function spawnBuilder(spawn: StructureSpawn): boolean {
   const creepParts = [WORK, WORK, CARRY, CARRY, MOVE];
   const creepName = "Builder_" + Game.time.toString();
   const creepMem = {
@@ -144,6 +140,7 @@ export function spawnBuilder(spawn: StructureSpawn): void {
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
+  return true;
 }
 
 export function spawnHauler(spawn: StructureSpawn): void {
@@ -169,14 +166,22 @@ export function spawnRefiller(spawn: StructureSpawn): void {
 }
 
 export function spawnUpgrader(spawn: StructureSpawn): void {
-  const creepParts = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]; // XXX: scaling body
+  let creepParts: BodyPartConstant[] | null;
+  let defaultBody = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]; // XXX: scaling body
+  if (bodyCost(defaultBody) <= spawn.room.energyAvailable)
+    creepParts = defaultBody;
+  else
+    creepParts = generateBody(spawn.room.energyAvailable, [], [WORK, CARRY], [MOVE])
+    if (!creepParts)
+      return;
+
   const creepName = "Upgrader_" + Game.time.toString();
   const creepMem = {
     role: Role.upgrader,
     delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
-  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+  const result = spawn.spawnCreep(creepParts, creepName, spawnOpts);
 }
 
 export function spawnClaimer(spawn: StructureSpawn): boolean {

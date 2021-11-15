@@ -20,7 +20,7 @@ export function generateBody(
 }
 
 /** generate the strongest miner body using the avaiable energy.
- * add as many WORK parts as possible (up to 5)
+ * add as many WORK parts as possible (up to 6) to account for ticks lost from travel 
  * add as many MOVE parts as possible (up to 5)
  */
 export function generateMinerBody(energy: number) {
@@ -28,8 +28,8 @@ export function generateMinerBody(energy: number) {
   energy -= bodyCost(body);
 
   // 5 work parts is enough to deplete a source in 300 ticks before it refreshes
-  // add up to 3 move parts (+2 in base pattern = 5)
-  for (let i = 0; i < 3 && energy >= BODYPART_COST[WORK]; i++) {
+  // add up to 4 move parts (+2 in base pattern = 6)
+  for (let i = 0; i < 4 && energy >= BODYPART_COST[WORK]; i++) {
     body.unshift(WORK);
     energy -= BODYPART_COST[WORK];
   }
