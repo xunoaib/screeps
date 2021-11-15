@@ -9,6 +9,7 @@ import roleScavenger, { Scavenger } from "scavenger";
 import roleHauler, { Hauler } from "hauler";
 import roleRefiller, { Refiller } from "refiller";
 import roleUpgrader, { Upgrader } from "upgrader";
+import roleClaimer, { Claimer } from "claimer";
 
 declare global {
   interface Memory {
@@ -66,6 +67,9 @@ export function runCreepLogic(creep: Creep): void {
     }
     case Role.upgrader: {
       return roleUpgrader.run(creep as Upgrader);
+    }
+    case Role.claimer: {
+      return roleClaimer.run(creep as Claimer);
     }
     default: {
       console.log(creep.name + " has an unknown role");

@@ -6,4 +6,5 @@ export enum Role {
   hauler = "hauler",
   refiller = "refiller",
   upgrader = "upgrader",
+  claimer = "claimer",
 }

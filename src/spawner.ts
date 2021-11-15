@@ -7,6 +7,7 @@ import { Hauler } from "hauler";
 import { generateMinerBody } from "creepBody";
 import { Refiller } from "refiller";
 import { Upgrader } from "upgrader";
+import { Claimer } from "claimer";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -27,9 +28,13 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const haulers = _.filter(Game.creeps, creep => creep.memory.role == Role.hauler) as Hauler[];
   const refillers = _.filter(Game.creeps, creep => creep.memory.role == Role.refiller) as Refiller[];
   const upgraders = _.filter(Game.creeps, creep => creep.memory.role == Role.upgrader) as Upgrader[];
+  const claimers = _.filter(Game.creeps, creep => creep.memory.role == Role.claimer) as Claimer[];
 
   const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
+  const blueFlags = spawn.room.find(FIND_FLAGS, {
+    filter: flag => flag.color == COLOR_BLUE
+  });
 
   const containers = spawn.room.find(FIND_STRUCTURES, {
     filter: structure => structure instanceof StructureContainer
@@ -64,6 +69,11 @@ export function handleSpawn(spawn: StructureSpawn): void {
 
   if (refillers.length < 1 && spawn.room.storage && containers.length) {
     return spawnRefiller(spawn);
+  }
+
+  // spawn claimer
+  if (claimers.length < 2 && blueFlags.length > 0) {
+    if (spawnClaimer(spawn)) return;
   }
 
   // spawn haulers to move energy into room storage
@@ -167,4 +177,15 @@ export function spawnUpgrader(spawn: StructureSpawn): void {
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnClaimer(spawn: StructureSpawn): boolean {
+  const creepParts = [CLAIM, MOVE];
+  const creepName = "Claimer_" + Game.time.toString();
+  const creepMem = {
+    role: Role.claimer,
+    claiming: false
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  return spawn.spawnCreep(creepParts, creepName, spawnOpts) == OK;
 }

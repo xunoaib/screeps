@@ -3,6 +3,7 @@ import { EnergyStructure } from "filters";
 export const RANGES = {
   HARVEST: 1,
   PICKUP: 1,
+  CLAIM: 1,
   TRANSFER: 1,
   WITHDRAW: 1,
   UPGRADE: 3,
@@ -43,6 +44,14 @@ export function goTransfer(
 export function goUpgrade(creep: Creep, target: StructureController) {
   if (creep.pos.inRangeTo(target.pos, RANGES.UPGRADE)) {
     return creep.upgradeController(target);
+  } else {
+    return goTo(creep, target);
+  }
+}
+
+export function goClaim(creep: Creep, target: StructureController) {
+  if (creep.pos.inRangeTo(target.pos, RANGES.CLAIM)) {
+    return creep.claimController(target);
   } else {
     return goTo(creep, target);
   }
