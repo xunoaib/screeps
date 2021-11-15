@@ -1,3 +1,5 @@
+import * as profiler from "./utils/screeps-profiler";
+
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role } from "creepConstants";
 import roleHarvester, { Harvester } from "harvester";
@@ -129,7 +131,7 @@ export function setupGlobalCache() {
   }
 }
 
-export const loop = ErrorMapper.wrapLoop(() => {
+export function main() {
   console.log(`<font color="green"><strong>Current game tick is ${Game.time}</strong></font>`);
 
   setupGlobalCache();
@@ -140,4 +142,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   cleanup();
 
   if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST) Game.cpu.generatePixel();
-});
+}
+
+profiler.enable();
+export const loop = ErrorMapper.wrapLoop(
+  () => profiler.wrap(main)
+);
