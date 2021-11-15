@@ -135,5 +135,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
   runAllCreepLogic();
   cleanup();
 
-  if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST + 50) Game.cpu.generatePixel();
+  if ("generatePixel" in Game.cpu && Game.cpu.bucket >= PIXEL_CPU_COST) Game.cpu.generatePixel();
 });
