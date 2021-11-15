@@ -1,11 +1,11 @@
 import { EnergyStructure } from "filters";
-import { RANGES, goPickup, goTransfer } from "CreepActions";
+import { RANGES, goPickup, goTransfer, goBuild } from "CreepActions";
 import { Role } from "creepConstants";
 
 export interface ScavengerMemory extends CreepMemory {
   role: Role.harvester;
   resource: Id<Resource>;
-  target: Id<EnergyStructure>;
+  target: Id<EnergyStructure | ConstructionSite>;
   delivering: boolean;
 }
 
@@ -37,14 +37,19 @@ const roleScavenger = {
       return;
     }
 
-    // upgrade or transfer to target
-    const range = target.structureType == STRUCTURE_CONTROLLER ? RANGES.UPGRADE : RANGES.TRANSFER;
-    const result = goTransfer(creep, target, RESOURCE_ENERGY, undefined, range);
-    if (result != OK) {
-      if (ERR_FULL) {
-        this.findDepoTarget(creep);
-      } else {
-        console.log(creep.name + ": error transferring dropped resources: " + result + " @ " + range);
+    // build construction site
+    if (target instanceof ConstructionSite) {
+      goBuild(creep, target);
+    } else {
+      // upgrade or transfer to target
+      const range = target.structureType == STRUCTURE_CONTROLLER ? RANGES.UPGRADE : RANGES.TRANSFER;
+      const result = goTransfer(creep, target, RESOURCE_ENERGY, undefined, range);
+      if (result != OK) {
+        if (ERR_FULL) {
+          this.findDepoTarget(creep);
+        } else {
+          console.log(creep.name + ": error transferring dropped resources: " + result + " @ " + range);
+        }
       }
     }
   },
@@ -91,12 +96,15 @@ const roleScavenger = {
       filter: structure =>
         (structure instanceof StructureSpawn || structure instanceof StructureExtension) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    }) as EnergyStructure | null;
+    }) as EnergyStructure | ConstructionSite | null;
 
     // refill towers
     target ??= creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure => structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    }) as StructureTower;
+    }) as StructureTower | null;
+
+    // build construction sites
+    target ??= creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES) as ConstructionSite | null;
 
     // refill containers/storage
     target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {
