@@ -20,7 +20,7 @@ export function handleRoomSpawns(room: Room): void {
 export function handleSpawn(spawn: StructureSpawn): void {
   if (spawn.spawning) return;
 
-  const creepCount = _.size(Game.creeps);
+  // FIXME: linear search
   const harvesters = _.filter(Game.creeps, creep => creep.memory.role == Role.harvester) as Harvester[];
   const builders = _.filter(Game.creeps, creep => creep.memory.role == Role.builder) as Builder[];
   const miners = _.filter(Game.creeps, creep => creep.memory.role == Role.miner) as Miner[];
@@ -41,7 +41,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }) as StructureContainer[];
 
   // ensure a minimum number of harvesters
-  if (harvesters.length < 2) {
+  if (harvesters.length < 2 && miners.length < 2 && scavengers.length < 2) {
     return spawnHarvester(spawn);
   }
 
@@ -55,19 +55,17 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return;
   }
 
-  // TODO: spawn builders early instead of scavengers
-
   // spawn scavengers to accommodate miners
   if (scavengers.length == 0 || scavengers.length < miners.length * 2) {
     return spawnScavenger(spawn);
   }
 
   // spawn one builder for every three sites, but enforce a maximum
-  if (sites.length && builders.length < 3 && builders.length * 3 < sites.length) {
+  if (sites.length && builders.length < 3) { // && builders.length * 3 < sites.length) {
     if (spawnBuilder(spawn)) return;
   }
 
-  if (refillers.length < 2 && containers.length) {
+  if (refillers.length < 1 && containers.length) {
     return spawnRefiller(spawn);
   }
 
@@ -77,18 +75,18 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn haulers to move energy into room storage
-  if (haulers.length < 6 && spawn.room.storage && _.filter(containers, container => container.store.energy > 200).length > 0) {
+  if (haulers.length < 7 && spawn.room.storage && _.filter(containers, container => container.store.energy > 300).length > 0) {
     return spawnHauler(spawn);
   }
 
-  if (upgraders.length < 4) {
+  if (upgraders.length < 1) {
     return spawnUpgrader(spawn);
   }
 
   // spawn extra harvesters otherwise
-  if (harvesters.length < 3) {
-    return spawnHarvester(spawn);
-  }
+  // if (harvesters.length < 0) {
+  //   return spawnHarvester(spawn);
+  // }
 }
 
 export function spawnMiner(spawn: StructureSpawn, source: Source): void {
@@ -167,13 +165,14 @@ export function spawnRefiller(spawn: StructureSpawn): void {
 
 export function spawnUpgrader(spawn: StructureSpawn): void {
   let creepParts: BodyPartConstant[] | null;
-  let defaultBody = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]; // XXX: scaling body
-  if (bodyCost(defaultBody) <= spawn.room.energyAvailable)
-    creepParts = defaultBody;
-  else
-    creepParts = generateBody(spawn.room.energyAvailable, [], [WORK, CARRY], [MOVE])
-    if (!creepParts)
-      return;
+  // let defaultBody = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]; // XXX: scaling body
+  // if (bodyCost(defaultBody) <= spawn.room.energyAvailable)
+  //   creepParts = defaultBody;
+  // else
+  //   creepParts = generateBody(spawn.room.energyAvailable, [], [WORK, CARRY], [MOVE])
+  //   if (!creepParts)
+  //     return;
+  creepParts = [WORK, WORK, CARRY, CARRY, MOVE, MOVE]; // XXX: scaling body
 
   const creepName = "Upgrader_" + Game.time.toString();
   const creepMem = {
@@ -181,7 +180,7 @@ export function spawnUpgrader(spawn: StructureSpawn): void {
     delivering: false
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
-  const result = spawn.spawnCreep(creepParts, creepName, spawnOpts);
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
 }
 
 export function spawnClaimer(spawn: StructureSpawn): boolean {

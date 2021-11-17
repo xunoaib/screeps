@@ -32,7 +32,7 @@ const roleUpgrader = {
   focusSourceContainer(creep: Upgrader) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure => (structure instanceof StructureContainer ||
-        structure instanceof StructureStorage) && structure.store.energy > 150
+        structure instanceof StructureStorage) && structure.store.energy > 1200
     }) as EnergyStructure | undefined;
 
     if (!target) return;
