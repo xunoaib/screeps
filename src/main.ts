@@ -101,6 +101,10 @@ export function runAllTowerRepairs() {
 }
 
 export function runTowerRepairs(room: Room) {
+  // avoid repairing when hostiles are near (repair function normally overrides attack)
+  const hostiles = room.find(FIND_HOSTILE_CREEPS);
+  if (hostiles.length) return;
+
   // only repair when there's surplus energy
   const towers: StructureTower[] = room.find(FIND_MY_STRUCTURES, {
     filter: tower => tower instanceof StructureTower && tower.store.energy > 100
