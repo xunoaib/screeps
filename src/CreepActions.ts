@@ -66,7 +66,8 @@ export function goWithdraw(creep: Creep, target: EnergyStructure | Tombstone, re
 }
 
 export function goTo(creep: Creep, pos: RoomPosition | { pos: RoomPosition }) {
-  if (creep.fatigue == 0) return creep.moveTo(pos, { visualizePathStyle: { stroke: "#ccc" } });
+  const opts = { visualizePathStyle: { stroke: "#ccc" } } as TravelToOptions;
+  if (creep.fatigue == 0) return creep.travelTo(pos, opts);
   return OK;
 }
 

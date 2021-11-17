@@ -1,0 +1,3 @@
+[submodule "src/utils/Traveler"]
+	path = src/utils/Traveler
+	url = https://github.com/bonzaiferroni/Traveler/

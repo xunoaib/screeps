@@ -1,4 +1,6 @@
 import * as profiler from "./utils/screeps-profiler";
+import * as Traveler from "./utils/Traveler/Traveler"
+Traveler; // trigger prototype injection
 
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role } from "creepConstants";

@@ -17,7 +17,7 @@ const roleMiner = {
     if (creep.memory.container) {
       const container = Game.getObjectById(creep.memory.container);
       if (container && !creep.pos.inRangeTo(container, 0)) {
-        creep.moveTo(container.pos);
+        goTo(creep, container);
       }
     } else {
       // memory unset, so look for a container
