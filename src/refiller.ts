@@ -45,7 +45,7 @@ const roleRefiller = {
     // find towers
     let target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure => structure instanceof StructureTower
-        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
     }) as EnergyStructure | undefined;
 
     // find spawn/extensions

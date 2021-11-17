@@ -75,11 +75,15 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn haulers to move energy into room storage
-  if (haulers.length < 7 && spawn.room.storage && _.filter(containers, container => container.store.energy > 300).length > 0) {
+  if (haulers.length < 8 && spawn.room.storage && _.filter(containers, container => container.store.energy > 300).length > 0) {
     return spawnHauler(spawn);
   }
 
-  if (upgraders.length < 1) {
+  if (scavengers.length < 5 && spawn.room.find(FIND_DROPPED_RESOURCES).length) {
+    return spawnScavenger(spawn);
+  }
+
+  if (upgraders.length < 6) {
     return spawnUpgrader(spawn);
   }
 
