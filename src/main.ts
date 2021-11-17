@@ -106,11 +106,10 @@ export function runTowerRepairs(room: Room) {
     filter: tower => tower instanceof StructureTower && tower.store.energy > 100
   });
 
-  const repairables = room
-    .find(FIND_STRUCTURES, {
-      filter: structure => structure.hits < structure.hitsMax
-    })
-    .sort((a, b) => b.hits - a.hits);
+  const repairables = room.find(FIND_STRUCTURES, {
+    filter: structure => structure.hits < structure.hitsMax &&
+      !((structure instanceof StructureRampart || structure instanceof StructureWall) && structure.hits >= 30000)
+  }).sort((a, b) => a.hits - b.hits);
 
   _.forEach(towers, tower => tower.repair(repairables[0]));
 }
