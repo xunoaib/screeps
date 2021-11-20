@@ -8,6 +8,7 @@ import { bodyCost, generateBody, generateMinerBody } from "creepBody";
 import { Refiller } from "refiller";
 import { Upgrader } from "upgrader";
 import { Claimer } from "claimer";
+import { Extractor, ExtractorMemory } from "extractor";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -29,11 +30,15 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const refillers = _.filter(Game.creeps, creep => creep.memory.role == Role.refiller) as Refiller[];
   const upgraders = _.filter(Game.creeps, creep => creep.memory.role == Role.upgrader) as Upgrader[];
   const claimers = _.filter(Game.creeps, creep => creep.memory.role == Role.claimer) as Claimer[];
+  const extractors = _.filter(Game.creeps, creep => creep.memory.role == Role.extractor) as Extractor[];
 
   const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
   const blueFlags = spawn.room.find(FIND_FLAGS, {
     filter: flag => flag.color == COLOR_BLUE
+  });
+  const extractorStructs = spawn.room.find(FIND_MY_STRUCTURES, {
+    filter: structure => structure instanceof StructureExtractor
   });
 
   const containers = spawn.room.find(FIND_STRUCTURES, {
@@ -83,7 +88,11 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return spawnScavenger(spawn);
   }
 
-  if (upgraders.length < 6) {
+  if (extractors.length < 1 && extractorStructs.length) {
+    return spawnExtractor(spawn);
+  }
+
+  if (upgraders.length < 4) {
     return spawnUpgrader(spawn);
   }
 
@@ -128,6 +137,17 @@ export function spawnHarvester(spawn: StructureSpawn): void {
     role: Role.harvester,
     harvesting: true,
     target: source.id
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnExtractor(spawn: StructureSpawn): void {
+  const creepParts = [WORK, WORK, WORK, CARRY, MOVE, MOVE];
+  const creepName = "Extractor_" + Game.time.toString();
+  const creepMem = {
+    role: Role.extractor,
+    harvesting: true,
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

@@ -11,7 +11,7 @@ export const RANGES = {
   REPAIR: 3
 };
 
-export function goHarvest(creep: Creep, source: Source) {
+export function goHarvest(creep: Creep, source: Source | Mineral) {
   if (creep.pos.inRangeTo(source.pos, RANGES.HARVEST)) {
     return creep.harvest(source);
   } else {
