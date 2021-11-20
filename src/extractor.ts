@@ -92,9 +92,11 @@ const roleExtractor = {
   focusDeliveryTarget(creep: Extractor) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
-        (structure instanceof StructureContainer || structure instanceof StructureStorage) &&
+        (structure instanceof StructureContainer ||
+        structure instanceof StructureStorage ||
+        structure instanceof StructureTerminal) &&
         structure.store.getFreeCapacity() > 0
-    }) as StructureContainer | StructureStorage;
+    }) as StructureContainer | StructureStorage | StructureTerminal;
 
     if (target) {
       creep.memory.target = target.id;
