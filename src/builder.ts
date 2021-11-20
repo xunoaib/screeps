@@ -1,4 +1,5 @@
 import { findClosestConstructionSites, goBuild, goHarvest, goPickup, goWithdraw } from "CreepActions";
+
 import { Role } from "creepConstants";
 
 export interface BuilderMemory extends CreepMemory {

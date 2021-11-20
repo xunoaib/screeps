@@ -1,4 +1,4 @@
-import { goWithdraw, goUpgrade, goClaim, goTo } from "CreepActions";
+import { goClaim, goTo } from "CreepActions";
 
 export interface ClaimerMemory extends CreepMemory {
   role: "claimer";
@@ -7,10 +7,10 @@ export interface ClaimerMemory extends CreepMemory {
 }
 
 /** captures adjacent rooms.
-*   moves towards a blue flag in the spawn room.
-*   blue flag must be on an exit tile.
-*   once the creep moves to another room, he begins capturing.
-*/
+ *   moves towards a blue flag in the spawn room.
+ *   blue flag must be on an exit tile.
+ *   once the creep moves to another room, he begins capturing.
+ */
 export interface Claimer extends Creep {
   memory: ClaimerMemory;
 }
@@ -56,12 +56,13 @@ const roleClaimer = {
     } else if (creep.room == flag.room) {
       console.log("going to flag in room");
       goTo(creep, flag.pos);
-    } else { // different room, time to capture
+    } else {
+      // different room, time to capture
       console.log("time to claim!");
       creep.memory.claiming = true;
       this.runClaim(creep);
     }
-  },
+  }
 };
 
 export default roleClaimer;

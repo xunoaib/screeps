@@ -1,4 +1,5 @@
 import { goHarvest, goTransfer } from "CreepActions";
+
 import { Role } from "creepConstants";
 
 export interface ExtractorMemory extends CreepMemory {
@@ -31,7 +32,7 @@ const roleExtractor = {
       this.focusDeliveryTarget(creep);
       return;
     }
-    const result = goHarvest(creep, target as Mineral);
+    const result = goHarvest(creep, target);
     if (result != OK) {
       if (result != ERR_NO_PATH && result != ERR_TIRED) {
         console.log(creep.name + ": error extracting: " + result);
@@ -54,8 +55,7 @@ const roleExtractor = {
 
     // deposit in target container
     const resourceType = Object.keys(creep.store)[0] as ResourceConstant;
-    if (resourceType == RESOURCE_ENERGY)
-      console.log("extractor has energy but shouldnt!");
+    if (resourceType == RESOURCE_ENERGY) console.log("extractor has energy but shouldnt!");
     const result = goTransfer(creep, target, resourceType);
 
     if (result == ERR_FULL) {
@@ -91,8 +91,9 @@ const roleExtractor = {
   /** Focus nearest storage/container for depositing minerals */
   focusDeliveryTarget(creep: Extractor) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: structure => (structure instanceof StructureContainer || structure instanceof StructureStorage)
-      && structure.store.getFreeCapacity() > 0
+      filter: structure =>
+        (structure instanceof StructureContainer || structure instanceof StructureStorage) &&
+        structure.store.getFreeCapacity() > 0
     }) as StructureContainer | StructureStorage;
 
     if (target) {

@@ -1,4 +1,5 @@
 import { findSourceContainer, goHarvest, goTo } from "CreepActions";
+
 import { Role } from "creepConstants";
 
 export interface MinerMemory extends CreepMemory {

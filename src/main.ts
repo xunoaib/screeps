@@ -1,20 +1,22 @@
+import * as Traveler from "./utils/Traveler/Traveler";
 import * as profiler from "./utils/screeps-profiler";
-import * as Traveler from "./utils/Traveler/Traveler"
-Traveler; // trigger prototype injection
+
+import roleBuilder, { Builder } from "builder";
+import roleClaimer, { Claimer } from "claimer";
+import roleExtractor, { Extractor } from "extractor";
+import roleHarvester, { Harvester } from "harvester";
+import roleHauler, { Hauler } from "hauler";
+import roleMiner, { Miner } from "miner";
+import roleRefiller, { Refiller } from "refiller";
+import roleScavenger, { Scavenger } from "scavenger";
+import roleUpgrader, { Upgrader } from "upgrader";
 
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role } from "creepConstants";
-import roleHarvester, { Harvester } from "harvester";
-import { handleAllSpawns } from "spawner";
 import { RoomManager } from "roomManager";
-import roleBuilder, { Builder } from "builder";
-import roleMiner, { Miner } from "miner";
-import roleScavenger, { Scavenger } from "scavenger";
-import roleHauler, { Hauler } from "hauler";
-import roleRefiller, { Refiller } from "refiller";
-import roleUpgrader, { Upgrader } from "upgrader";
-import roleClaimer, { Claimer } from "claimer";
-import roleExtractor, { Extractor } from "extractor";
+import { handleAllSpawns } from "spawner";
+
+Traveler; // trigger prototype injection
 
 declare global {
   interface Memory {
@@ -114,10 +116,13 @@ export function runTowerRepairs(room: Room) {
     filter: tower => tower instanceof StructureTower && tower.store.energy > 100
   });
 
-  const repairables = room.find(FIND_STRUCTURES, {
-    filter: structure => structure.hits < structure.hitsMax &&
-      !((structure instanceof StructureRampart || structure instanceof StructureWall) && structure.hits >= 30000)
-  }).sort((a, b) => a.hits - b.hits);
+  const repairables = room
+    .find(FIND_STRUCTURES, {
+      filter: structure =>
+        structure.hits < structure.hitsMax &&
+        !((structure instanceof StructureRampart || structure instanceof StructureWall) && structure.hits >= 30000)
+    })
+    .sort((a, b) => a.hits - b.hits);
 
   _.forEach(towers, tower => tower.repair(repairables[0]));
 }
@@ -154,6 +159,4 @@ export function main() {
 }
 
 profiler.enable();
-export const loop = ErrorMapper.wrapLoop(
-  () => profiler.wrap(main)
-);
+export const loop = ErrorMapper.wrapLoop(() => profiler.wrap(main));

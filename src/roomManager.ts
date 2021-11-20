@@ -1,7 +1,7 @@
 /** tracks structures/objects in a room to avoid redundant queries */
 
-import { Role } from "creepConstants";
 import { Harvester } from "harvester";
+import { Role } from "creepConstants";
 
 export class RoomManager {
   room: Room;

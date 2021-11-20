@@ -1,4 +1,5 @@
-import { goWithdraw, goUpgrade } from "CreepActions";
+import { goUpgrade, goWithdraw } from "CreepActions";
+
 import { EnergyStructure } from "filters";
 
 export interface UpgraderMemory extends CreepMemory {
@@ -31,8 +32,9 @@ const roleUpgrader = {
   /** find a container to grab energy from */
   focusSourceContainer(creep: Upgrader) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: structure => (structure instanceof StructureContainer ||
-        structure instanceof StructureStorage) && structure.store.energy > 1200
+      filter: structure =>
+        (structure instanceof StructureContainer || structure instanceof StructureStorage) &&
+        structure.store.energy > 1200
     }) as EnergyStructure | undefined;
 
     if (!target) return;
@@ -65,7 +67,7 @@ const roleUpgrader = {
     }
 
     goWithdraw(creep, target, RESOURCE_ENERGY);
-  },
+  }
 };
 
 export default roleUpgrader;

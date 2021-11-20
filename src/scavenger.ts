@@ -1,5 +1,6 @@
+import { RANGES, goBuild, goPickup, goTransfer } from "CreepActions";
+
 import { EnergyStructure } from "filters";
-import { RANGES, goPickup, goTransfer, goBuild } from "CreepActions";
 import { Role } from "creepConstants";
 
 export interface ScavengerMemory extends CreepMemory {
@@ -101,10 +102,10 @@ const roleScavenger = {
     // refill towers
     target ??= creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure => structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    }) as StructureTower | null;
+    }) as StructureTower;
 
     // build construction sites
-    target ??= creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES) as ConstructionSite | null;
+    target ??= creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
 
     // refill containers/storage
     target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {

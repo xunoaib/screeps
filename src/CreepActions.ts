@@ -57,7 +57,12 @@ export function goClaim(creep: Creep, target: StructureController) {
   }
 }
 
-export function goWithdraw(creep: Creep, target: EnergyStructure | Tombstone, resource: ResourceConstant, amount?: number) {
+export function goWithdraw(
+  creep: Creep,
+  target: EnergyStructure | Tombstone,
+  resource: ResourceConstant,
+  amount?: number
+) {
   if (creep.pos.inRangeTo(target.pos, RANGES.WITHDRAW)) {
     return creep.withdraw(target, resource, amount);
   } else {

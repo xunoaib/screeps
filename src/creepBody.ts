@@ -20,7 +20,7 @@ export function generateBody(
 }
 
 /** generate the strongest miner body using the avaiable energy.
- * add as many WORK parts as possible (up to 6) to account for ticks lost from travel 
+ * add as many WORK parts as possible (up to 6) to account for ticks lost from travel
  * add as many MOVE parts as possible (up to 5)
  */
 export function generateMinerBody(energy: number) {

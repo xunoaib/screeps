@@ -1,6 +1,7 @@
 import { goTransfer, goWithdraw } from "CreepActions";
-import { Role } from "creepConstants";
+
 import { EnergyStructure } from "filters";
+import { Role } from "creepConstants";
 
 export interface RefillerMemory extends CreepMemory {
   role: Role.hauler;
@@ -30,8 +31,8 @@ const roleRefiller = {
   /** find a container to grab energy from */
   focusSourceContainer(creep: Refiller) {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: structure => (structure instanceof StructureStorage || structure instanceof StructureContainer)
-        && structure.store.energy > 0
+      filter: structure =>
+        (structure instanceof StructureStorage || structure instanceof StructureContainer) && structure.store.energy > 0
     }) as StructureContainer | StructureStorage | undefined;
 
     if (!target) return;
@@ -44,14 +45,15 @@ const roleRefiller = {
   focusTargetContainer(creep: Refiller) {
     // find towers
     let target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-      filter: structure => structure instanceof StructureTower
-        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
+      filter: structure =>
+        structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
     }) as EnergyStructure | undefined;
 
     // find spawn/extensions
     target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {
-      filter: structure => (structure instanceof StructureSpawn || structure instanceof StructureExtension)
-        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+      filter: structure =>
+        (structure instanceof StructureSpawn || structure instanceof StructureExtension) &&
+        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | undefined;
 
     if (!target) return;
@@ -75,10 +77,8 @@ const roleRefiller = {
     if (creep.store.getFreeCapacity(RESOURCE_ENERGY) != 0) {
       // cant withdraw from depot (out of energy, etc)
       if (goWithdraw(creep, target, RESOURCE_ENERGY) != OK) {
-        if (creep.store.energy > 0)
-          this.focusTargetContainer(creep);
-        else
-          this.focusSourceContainer(creep);
+        if (creep.store.energy > 0) this.focusTargetContainer(creep);
+        else this.focusSourceContainer(creep);
       }
     } else {
       this.focusTargetContainer(creep);

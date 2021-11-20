@@ -1,5 +1,6 @@
-import { EnergyStructure } from "filters";
 import { RANGES, findEnergyTarget, goHarvest, goRepair, goTransfer } from "CreepActions";
+
+import { EnergyStructure } from "filters";
 import { Role } from "creepConstants";
 
 export interface HarvesterMemory extends CreepMemory {

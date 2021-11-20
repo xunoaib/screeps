@@ -1,14 +1,15 @@
 import { Harvester, HarvesterMemory } from "harvester";
-import { Builder, BuilderMemory } from "builder";
-import { Role } from "creepConstants";
 import { Miner, MinerMemory } from "miner";
-import { Scavenger } from "scavenger";
-import { Hauler } from "hauler";
-import { bodyCost, generateBody, generateMinerBody } from "creepBody";
-import { Refiller } from "refiller";
-import { Upgrader } from "upgrader";
+
+import { Builder } from "builder";
 import { Claimer } from "claimer";
-import { Extractor, ExtractorMemory } from "extractor";
+import { Extractor } from "extractor";
+import { Hauler } from "hauler";
+import { Refiller } from "refiller";
+import { Role } from "creepConstants";
+import { Scavenger } from "scavenger";
+import { Upgrader } from "upgrader";
+import { generateMinerBody } from "creepBody";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -39,7 +40,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
   });
   const extractorStructs = spawn.room.find(FIND_MY_STRUCTURES, {
     filter: structure => structure instanceof StructureExtractor
-  });
+  }) as StructureExtractor[];
 
   const containers = spawn.room.find(FIND_STRUCTURES, {
     filter: structure => structure instanceof StructureContainer
@@ -66,7 +67,8 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn one builder for every three sites, but enforce a maximum
-  if (sites.length && builders.length < 3) { // && builders.length * 3 < sites.length) {
+  if (sites.length && builders.length < 3) {
+    // && builders.length * 3 < sites.length) {
     if (spawnBuilder(spawn)) return;
   }
 
@@ -80,11 +82,15 @@ export function handleSpawn(spawn: StructureSpawn): void {
   }
 
   // spawn haulers to move energy into room storage
-  if (haulers.length < 8 && spawn.room.storage && _.filter(containers, container => container.store.energy > 300).length > 0) {
+  if (
+    haulers.length < 8 &&
+    spawn.room.storage &&
+    _.filter(containers, container => container.store.energy > 300).length > 0
+  ) {
     return spawnHauler(spawn);
   }
 
-  if (scavengers.length < 5 && spawn.room.find(FIND_DROPPED_RESOURCES).length) {
+  if (scavengers.length < 3 && spawn.room.find(FIND_DROPPED_RESOURCES).length) {
     return spawnScavenger(spawn);
   }
 
@@ -143,11 +149,11 @@ export function spawnHarvester(spawn: StructureSpawn): void {
 }
 
 export function spawnExtractor(spawn: StructureSpawn): void {
-  const creepParts = [WORK, WORK, WORK, CARRY, MOVE, MOVE];
+  const creepParts = [WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE];
   const creepName = "Extractor_" + Game.time.toString();
   const creepMem = {
     role: Role.extractor,
-    harvesting: true,
+    harvesting: true
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);
