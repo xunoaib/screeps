@@ -4,4 +4,5 @@ export type EnergyStructure =
   | StructureExtension
   | StructureStorage
   | StructureController
-  | StructureTower;
+  | StructureTower
+  | StructureTerminal;

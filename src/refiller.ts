@@ -56,6 +56,10 @@ const roleRefiller = {
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | undefined;
 
+    // supply terminal
+    if (!target && creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 3000)
+      target = creep.room.terminal;
+
     if (!target) return;
 
     creep.memory.target = target.id;
