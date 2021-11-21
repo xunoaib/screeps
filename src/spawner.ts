@@ -10,6 +10,7 @@ import { Role } from "creepConstants";
 import { Scavenger } from "scavenger";
 import { Upgrader } from "upgrader";
 import { generateMinerBody } from "creepBody";
+import { MineralHauler } from "haulerMineral";
 
 export function handleAllSpawns(): void {
   _.map(Game.rooms, handleRoomSpawns);
@@ -32,7 +33,11 @@ export function handleSpawn(spawn: StructureSpawn): void {
   const upgraders = _.filter(Game.creeps, creep => creep.memory.role == Role.upgrader) as Upgrader[];
   const claimers = _.filter(Game.creeps, creep => creep.memory.role == Role.claimer) as Claimer[];
   const extractors = _.filter(Game.creeps, creep => creep.memory.role == Role.extractor) as Extractor[];
+  const mineralHaulers = _.filter(Game.creeps, creep => creep.memory.role == Role.mineralHauler) as MineralHauler[];
 
+  const minableMinerals = spawn.room.find(FIND_MINERALS, {
+    filter: mineral => mineral.mineralAmount > 0
+  });
   const sources = spawn.room.find(FIND_SOURCES_ACTIVE);
   const sites = spawn.room.find(FIND_CONSTRUCTION_SITES);
   const blueFlags = spawn.room.find(FIND_FLAGS, {
@@ -76,6 +81,10 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return spawnRefiller(spawn);
   }
 
+  if (spawn.room.terminal && minableMinerals.length && mineralHaulers.length < 1) {
+    return spawnMineralHauler(spawn);
+  }
+
   // spawn claimer
   if (claimers.length < 2 && blueFlags.length > 0) {
     if (spawnClaimer(spawn)) return;
@@ -94,7 +103,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
     return spawnScavenger(spawn);
   }
 
-  if (extractors.length < 1 && extractorStructs.length) {
+  if (extractors.length < 1 && minableMinerals.length && extractorStructs.length) {
     return spawnExtractor(spawn);
   }
 
@@ -177,6 +186,23 @@ export function spawnHauler(spawn: StructureSpawn): void {
   const creepMem = {
     role: Role.hauler,
     delivering: false
+  };
+  const spawnOpts: SpawnOptions = { memory: creepMem };
+  spawn.spawnCreep(creepParts, creepName, spawnOpts);
+}
+
+export function spawnMineralHauler(spawn: StructureSpawn): void {
+  // associate hauler with a specific mineral type
+  const resources = spawn.room.find(FIND_MINERALS);
+  if (!resources.length) return;
+  const resourceType = resources[0].mineralType;
+
+  const creepParts = [WORK, CARRY, MOVE];
+  const creepName = "MineralHauler_" + Game.time.toString();
+  const creepMem = {
+    role: Role.mineralHauler,
+    delivering: false,
+    resourceType: resourceType
   };
   const spawnOpts: SpawnOptions = { memory: creepMem };
   spawn.spawnCreep(creepParts, creepName, spawnOpts);

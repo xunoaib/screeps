@@ -15,6 +15,7 @@ import { ErrorMapper } from "utils/ErrorMapper";
 import { Role } from "creepConstants";
 import { RoomManager } from "roomManager";
 import { handleAllSpawns } from "spawner";
+import roleMineralHauler, { MineralHauler } from "haulerMineral";
 
 Traveler; // trigger prototype injection
 
@@ -97,6 +98,9 @@ export function runCreepLogic(creep: Creep): void {
     }
     case Role.extractor: {
       return roleExtractor.run(creep as Extractor);
+    }
+    case Role.mineralHauler: {
+      return roleMineralHauler.run(creep as MineralHauler);
     }
     default: {
       console.log(creep.name + " has an unknown role");
