@@ -44,12 +44,12 @@ declare global {
   }
 }
 
-global.deal = function deal(orderId: string, amount: number) {
+function deal(orderId: string, amount: number) {
   const roomName = Game.spawns['Spawn1'].room.name;
   return Game.market.deal(orderId, amount, roomName);
 }
 
-global.cost = function cost(orderId: string, amount: number) {
+export function calcCost(orderId: string, amount: number) {
   const order = Game.market.getOrderById(orderId);
   if (!order) {
     console.log("invalid order id: " + orderId);
@@ -58,6 +58,9 @@ global.cost = function cost(orderId: string, amount: number) {
   const roomName = Game.spawns['Spawn1'].room.name;
   return Game.market.calcTransactionCost(amount, order.roomName as string, roomName);
 }
+
+global.cost = calcCost;
+global.deal = deal;
 
 export function runAllCreepLogic(): void {
   _.map(Game.rooms, runRoomCreepLogic);
@@ -133,9 +136,9 @@ export function runTowerRepairs(room: Room) {
   if (hostiles.length) return;
 
   // only repair when there's surplus energy
-  const towers: StructureTower[] = room.find(FIND_MY_STRUCTURES, {
-    filter: tower => tower instanceof StructureTower && tower.store.energy > 100
-  });
+  const towers = room.find(FIND_MY_STRUCTURES, {
+    filter: tower => tower instanceof StructureTower && tower.store.energy > 250
+  }) as StructureTower[];
 
   const repairables = room
     .find(FIND_STRUCTURES, {
@@ -145,7 +148,7 @@ export function runTowerRepairs(room: Room) {
     })
     .sort((a, b) => a.hits - b.hits);
 
-  _.forEach(towers, tower => tower.repair(repairables[0]));
+  towers.forEach(tower => tower.repair(repairables[0]));
 }
 
 // automatically delete memory of missing creeps

@@ -33,7 +33,7 @@ const roleRefiller = {
     const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
         (structure instanceof StructureStorage || structure instanceof StructureContainer) && structure.store.energy > 0
-    }) as StructureContainer | StructureStorage | undefined;
+    }) as StructureContainer | StructureStorage | null;
 
     if (!target) return;
 
@@ -47,14 +47,14 @@ const roleRefiller = {
     let target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: structure =>
         structure instanceof StructureTower && structure.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
-    }) as EnergyStructure | undefined;
+    }) as EnergyStructure | null;
 
     // find spawn/extensions
     target ??= creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
         (structure instanceof StructureSpawn || structure instanceof StructureExtension) &&
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    }) as EnergyStructure | undefined;
+    }) as EnergyStructure | null;
 
     // supply terminal
     if (!target && creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 3000)
