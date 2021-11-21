@@ -42,7 +42,7 @@ const roleHauler = {
 
   /** find storage to deliver energy to */
   focusTargetContainer(creep: Hauler) {
-    const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
         (structure instanceof StructureSpawn ||
           structure instanceof StructureExtension ||
@@ -50,7 +50,14 @@ const roleHauler = {
         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     }) as EnergyStructure | null;
 
-    if (!target) return;
+    if (!target) {
+      // look for terminal
+      target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+        filter: structure => structure instanceof StructureTerminal
+      }) as StructureTerminal | null;
+
+      if (!target) return;
+    }
 
     creep.memory.target = target.id;
     creep.memory.delivering = true;
