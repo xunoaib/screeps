@@ -28,6 +28,8 @@ declare global {
     interface Global {
       log: any;
       age?: number;
+      deal: any;
+      cost: any;
     }
   }
 
@@ -39,6 +41,21 @@ declare global {
   interface CreepMemory {
     role: string;
   }
+}
+
+global.deal = function deal(orderId: string, amount: number) {
+  const roomName = Game.spawns['Spawn1'].room.name;
+  return Game.market.deal(orderId, amount, roomName);
+}
+
+global.cost = function cost(orderId: string, amount: number) {
+  const order = Game.market.getOrderById(orderId);
+  if (!order) {
+    console.log("invalid order id: " + orderId);
+    return;
+  }
+  const roomName = Game.spawns['Spawn1'].room.name;
+  return Game.market.calcTransactionCost(amount, order.roomName as string, roomName);
 }
 
 export function runAllCreepLogic(): void {
