@@ -34,7 +34,10 @@ const roleExtractor = {
     }
     const result = goHarvest(creep, target);
     if (result != OK) {
-      if (result != ERR_NO_PATH && result != ERR_TIRED) {
+      if (result == ERR_NOT_ENOUGH_RESOURCES) {
+        console.log(creep.name + " exhausted mineral");
+        this.focusDeliveryTarget(creep);
+      } else if (result != ERR_NO_PATH && result != ERR_TIRED) {
         console.log(creep.name + ": error extracting: " + result);
       }
     }
