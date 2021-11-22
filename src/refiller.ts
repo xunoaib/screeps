@@ -57,7 +57,7 @@ const roleRefiller = {
     }) as EnergyStructure | null;
 
     // supply terminal
-    if (!target && creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 3000)
+    if (!target && creep.room.terminal && creep.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 15000)
       target = creep.room.terminal;
 
     if (!target) return;

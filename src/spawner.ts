@@ -77,7 +77,7 @@ export function handleSpawn(spawn: StructureSpawn): void {
     if (spawnBuilder(spawn)) return;
   }
 
-  if (refillers.length < 1 && containers.length) {
+  if (refillers.length < 3 && containers.length) {
     return spawnRefiller(spawn);
   }
 
@@ -158,7 +158,7 @@ export function spawnHarvester(spawn: StructureSpawn): void {
 }
 
 export function spawnExtractor(spawn: StructureSpawn): void {
-  const creepParts = [WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE];
+  const creepParts = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE];
   const creepName = "Extractor_" + Game.time.toString();
   const creepMem = {
     role: Role.extractor,
@@ -209,7 +209,7 @@ export function spawnMineralHauler(spawn: StructureSpawn): void {
 }
 
 export function spawnRefiller(spawn: StructureSpawn): void {
-  const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE];
+  const creepParts = [WORK, CARRY, CARRY, MOVE, MOVE, MOVE];
   const creepName = "Refiller_" + Game.time.toString();
   const creepMem = {
     role: Role.refiller,
